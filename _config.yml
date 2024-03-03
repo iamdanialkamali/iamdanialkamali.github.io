@@ -8,7 +8,7 @@
 
 # Basic Site Settings
 locale                   : "en-US"
-title                    : "Your Name / Site Title"
+title                    : "Danial Kamali"
 title_separator          : "-"
 name                     : &name "Danial Kamali"
 description              : &description "Artificial Intelligence Researcher"
@@ -27,7 +27,7 @@ author:
   bio              : "Curious Researcher"
   location         : "Michigan"
   employer         : "Michigan State University"
-  uri              : "iamdanialkamali.github.io"
+  uri              : # "iamdanialkamali.github.io"
   email            : "kamalida@msu.edu" 
 
   # Academic websites
