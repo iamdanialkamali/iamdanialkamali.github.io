@@ -31,10 +31,10 @@ author:
   email            : "kamalida@msu.edu" 
 
   # Academic websites
-  arxiv            : "https://www.semanticscholar.org/author/Danial-Kamali/89382735"
+  arxiv            : #"https://www.semanticscholar.org/author/Danial-Kamali/89382735"
   googlescholar    : "https://scholar.google.com/citations?user=7HD_2VYAAAAJ"
   impactstory      : # URL
-  orcid            : "https://orcid.org/my-orcid?orcid=0000-0002-2652-2339"
+  orcid            : #"https://orcid.org/my-orcid?orcid=0000-0002-2652-2339"
   pubmed           : # None
   researchgate     : "https://www.researchgate.net/profile/Danial-Kamali"
 
