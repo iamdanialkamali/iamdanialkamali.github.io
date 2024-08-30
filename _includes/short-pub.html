@@ -51,7 +51,8 @@
     text-decoration: none;
     padding: 4px 8px;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    background-color: #ffffff; /* Set the background to white */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
 
   .download-link a i {
@@ -60,7 +61,9 @@
   }
 
   .download-link a:hover {
-    background-color: #0056b3;
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
   }
 
 
@@ -70,13 +73,13 @@
   <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     {% if include.type == "grid" and teaser %}
       <div class="archive__item-teaser">
-<!--        <img src=-->
-<!--          {% if teaser contains "://" %}-->
-<!--            "{{ teaser }}"-->
-<!--          {% else %}-->
-<!--            "{{ teaser | prepend: "/images/" | prepend: base_path }}"-->
-<!--          {% endif %}-->
-<!--          alt="">-->
+        <img src=
+          {% if teaser contains "://" %}
+            "{{ teaser }}"
+          {% else %}
+            "{{ teaser | prepend: "/images/" | prepend: base_path }}"
+          {% endif %}
+          alt="">
       </div>
     {% endif %}
 
