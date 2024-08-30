@@ -29,7 +29,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: 12px;
     opacity: 0;
     transition: opacity 0.3s ease;
     text-align: center;
@@ -65,18 +65,18 @@
 
 
 </style>
-<div class="{{ include.type | default: "list" }}__item">
+<div class="{{ include.type | default: list__item}}">
 
   <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     {% if include.type == "grid" and teaser %}
       <div class="archive__item-teaser">
-        <img src=
-          {% if teaser contains "://" %}
-            "{{ teaser }}"
-          {% else %}
-            "{{ teaser | prepend: "/images/" | prepend: base_path }}"
-          {% endif %}
-          alt="">
+<!--        <img src=-->
+<!--          {% if teaser contains "://" %}-->
+<!--            "{{ teaser }}"-->
+<!--          {% else %}-->
+<!--            "{{ teaser | prepend: "/images/" | prepend: base_path }}"-->
+<!--          {% endif %}-->
+<!--          alt="">-->
       </div>
     {% endif %}
 
