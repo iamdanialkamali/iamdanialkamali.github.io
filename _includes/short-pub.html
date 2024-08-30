@@ -1,0 +1,180 @@
+{% include base_path %}
+
+{% if post.header.teaser %}
+  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% else %}
+  {% assign teaser = site.teaser %}
+{% endif %}
+
+{% if post.id %}
+  {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
+{% else %}
+  {% assign title = post.title %}
+{% endif %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div id="copy-notification" style="display:none;">
+  <span id="copy-notification-message">Citation copied to clipboard!</span>
+</div>
+<style>
+  #copy-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
+  }
+
+  .download-links {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    margin: 10px 0;
+  }
+
+  .download-link a {
+    display: inline-flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #007bff;
+    border: 3px solid #007bff; /* Add a thick border */
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .download-link a i {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+
+  .download-link a:hover {
+    background-color: #0056b3;
+  }
+
+
+</style>
+<div class="{{ include.type | default: "list" }}__item">
+
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    {% if include.type == "grid" and teaser %}
+      <div class="archive__item-teaser">
+        <img src=
+          {% if teaser contains "://" %}
+            "{{ teaser }}"
+          {% else %}
+            "{{ teaser | prepend: "/images/" | prepend: base_path }}"
+          {% endif %}
+          alt="">
+      </div>
+    {% endif %}
+
+    <h2 itemprop="headline">
+      {% if post.link %}
+        <a href="{{ post.link }}">{{ title }}</a> <a href="{{ base_path }}{{ post.url }}" rel="permalink"><i class="fa fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
+      {% else %}
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ title }}</a>
+      {% endif %}
+    </h2>
+    <p><i>{{ post.venue }}</i>, {{ post.date | default: "1900-01-01" | date: "%Y" }} </p>
+
+    <div class="download-links">
+      {% if post.paperurl %}
+      <div class="download-link">
+        <a href="{{ post.paperurl }}" target="_blank">
+          <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
+        </a>
+      </div>
+      {% endif %}
+
+      {% if post.slidesurl %}
+      <div class="download-link">
+        <a href="{{ post.slidesurl }}" target="_blank">
+          <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
+        </a>
+      </div>
+      {% endif %}
+
+      {% if post.posterurl %}
+      <div class="download-link">
+        <a href="{{ post.posterurl }}" target="_blank">
+          <i class="fa fa-image" aria-hidden="true"></i> Poster
+        </a>
+      </div>
+      {% endif %}
+
+      {% if post.codeurl %}
+      <div class="download-link">
+        <a href="{{ post.codeurl }}" target="_blank">
+          <i class="fa fa-code" aria-hidden="true"></i> Code
+        </a>
+      </div>
+      {% endif %}
+
+      {% if post.bibtex %}
+      <div class="download-link">
+        <a href="javascript:void(0);" onclick="copyCitation('{{ post.id }}')">
+          <i class="fa fa-clipboard" aria-hidden="true"></i> bib
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if post.citation %}
+    <p id="citation-{{ post.id }}" style="display:none;">{{ post.citation }}</p>
+    {% endif %}
+
+
+  </article>
+</div>
+
+  <script>
+    function copyCitation(postId) {
+    const citationText = document.getElementById(`citation-${postId}`).innerText;
+
+    // Create a temporary element to hold the text
+    const tempElement = document.createElement('textarea');
+    tempElement.value = citationText;
+    document.body.appendChild(tempElement);
+
+    // Select and copy the text
+    tempElement.select();
+    document.execCommand('copy');
+
+    // Remove the temporary element
+    document.body.removeChild(tempElement);
+
+    // Show custom notification
+    showNotification('Citation copied to clipboard!');
+  }
+
+    function showNotification(message) {
+    const notification = document.getElementById('copy-notification');
+    const notificationMessage = document.getElementById('copy-notification-message');
+
+    notificationMessage.textContent = message;
+    notification.style.display = 'block';
+    notification.style.opacity = '1';
+
+    // Hide the notification after 3 seconds
+    setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => {
+    notification.style.display = 'none';
+  }, 300); // Wait for the fade-out transition to complete
+  }, 3000); // Show notification for 3 seconds
+  }
+</script>
+
+

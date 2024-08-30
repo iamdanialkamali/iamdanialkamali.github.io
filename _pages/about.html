@@ -1,0 +1,23 @@
+---
+permalink: /
+title: "Danial's Website"
+author_profile: true
+redirect_from: 
+  - /about/
+  - /about.html
+---
+
+I am graduate student at Michigan State University working at HLR lab, specializing in the fascinating intersection of Vision and Language within Computer Science. My journey began at Iran University of Science and Technology, where I delved into Computer Engineering, focusing on Facial Expression Recognition and NLP Lexical Analysis. My career has been a blend of rigorous academic research and dynamic industry experience, marked by roles such as Graduate Research Assistant and Backend Team Leader. My work spans developing deep learning tasks, researching compositional generalization in multimodal systems, and leading misinformation detection projects. I have published in top conferences and with a skill set in advanced programming and AI frameworks, I am dedicated to pushing the boundaries of machine learning and natural language processing to solve complex, real-world problems.
+
+
+
+<h2>News</h2>
+
+<h2>Selected Publications</h2>
+{% include base_path %}
+
+{% for post in site.publications reversed %}
+{% include short-pub.html %}
+{% endfor %}
+
+
