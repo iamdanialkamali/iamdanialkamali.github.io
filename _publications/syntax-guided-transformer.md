@@ -5,6 +5,7 @@ permalink: /publication/syntax-guided-transformer
 excerpt: 'In this work, we proposed the syntax guided transformer to improve the compositional generalization in grounding.'
 date: 2023-12-06
 venue: "The Conference on Empirical Methods in Natural Language Processing Genbench Workshop"
+image: "https://reascan.github.io/assets/data-browser-examples/138-no-target.png"
 paperurl: "https://aclanthology.org/2023.genbench-1.10.pdf"
 slidesurl: "files/syntax-guided-transformer/slides.pdf"
 posterurl: "files/syntax-guided-transformer/poster.pdf"
