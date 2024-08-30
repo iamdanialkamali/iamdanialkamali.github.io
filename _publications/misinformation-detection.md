@@ -4,8 +4,11 @@ collection: publications
 permalink: /publication/misinformation-detection
 excerpt: 'In this work we introduce a persuasive strategy detection dataset and show using their labels can improve misinformation detection and explanation.'
 date: 2024-05-01
-venue: '2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation'
-paperurl: 'https://arxiv.org/abs/2211.05985'
+venue: 'Joint International Conference on Computational Linguistics, Language Resources and Evaluation'
+paperurl: 'https://aclanthology.org/2024.lrec-main.1501.pdf'
+#slidesurl: "files/misinformation-detection/slides.pdf"
+#posterurl: "files/misinformation-detection/poster.pdf"
+#codeurl: "https://github.com/HLR/Misinformation-Detection"
 citation: 'Kamali, D., Romain, J., Liu, H., Peng, W., Meng, J., & Kordjamshidi, P. (2023). Using Persuasive Writing Strategies to Explain and Detect Health Misinformation. arXiv preprint arXiv:2211.05985.'
 ---
 
