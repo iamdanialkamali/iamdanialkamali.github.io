@@ -246,8 +246,8 @@ defaults:
       path: ""
       type: publications
     values:
-      layout: single
-      author_profile: true
+      layout: publication
+      author_profile: false
       share: true
       comments: true
   # _portfolio
