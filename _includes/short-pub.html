@@ -35,6 +35,7 @@
     display: flex;
     gap: 10px; /* Space between the buttons */
     margin: 10px 0;
+    flex-wrap: wrap;
   }
   .download-link a {
     display: inline-flex;
@@ -68,18 +69,18 @@
 <div class="{{ include.type | default: list__item }}">
   <div style="display: inline-flex; width: 100%">
     <div style="width: 25%; align-self: center">
-      <img style="padding: 0px 7px 5px 0px" src="{{ post.image }}">
+      <img style="padding: 0px 7px 5px 0px" src="{{ base_path }}/{{ post.image }}">
     </div>
     <div style="width: 70%">
       <h3 itemprop="headline" style="margin: 0.5em 0 0.5em;">
         {% if post.link %}
         <a href="{{ post.link }}">{{ post.title }}</a>
-        <a href="{{ base_path }}{{ post.url }}" rel="permalink">
+        <a href="{{ base_path }}/{{ post.url }}" rel="permalink">
           <i class="fa fa-link" aria-hidden="true" title="permalink"></i>
           <span class="sr-only">Permalink</span>
         </a>
         {% else %}
-        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
+        <a href="{{ base_path }}/{{ post.url }}" rel="permalink">{{ post.title }}</a>
         {% endif %}
       </h3>
       <p style="margin: 0px 0 0.3em; font-size: 0.8em; line-height: 1">
@@ -96,7 +97,7 @@
 
         {% if post.slidesurl %}
         <div class="download-link">
-          <a href="{{ post.slidesurl }}" target="_blank">
+          <a href="{{ base_path }}/{{ post.slidesurl }}" target="_blank">
             <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
           </a>
         </div>
@@ -104,7 +105,7 @@
 
         {% if post.posterurl %}
         <div class="download-link">
-          <a href="{{ post.posterurl }}" target="_blank">
+          <a href="{{ base_path }}/{{ post.posterurl }}" target="_blank">
             <i class="fa fa-image" aria-hidden="true"></i> Poster
           </a>
         </div>

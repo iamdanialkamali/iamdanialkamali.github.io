@@ -14,6 +14,65 @@ layout: default
   {% endunless %}
 {% endif %}
 
+<style>
+  .bibtex-container {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    max-width: 800px;
+  }
+
+  .bibtex-entry {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin: 10px 0 0;
+  }
+
+  .copy-bibtex-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .copy-bibtex-btn:hover {
+    background-color: #0056b3;
+  }
+
+</style>
+
+<script>
+  function copyBibtex(elementId) {
+    const bibtexEntry = document.getElementById(elementId).innerText;
+
+    // Create a temporary textarea to hold the BibTeX text
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = bibtexEntry;
+    document.body.appendChild(tempTextarea);
+
+    // Select and copy the text
+    tempTextarea.select();
+    document.execCommand('copy');
+
+    // Remove the temporary textarea
+    document.body.removeChild(tempTextarea);
+
+    // Optional: Provide feedback to the user
+    alert('BibTeX entry copied to clipboard!');
+  }
+
+</script>
+
 <div id="main" role="main">
   {% include sidebar.html %}
 
