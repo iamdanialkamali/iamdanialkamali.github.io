@@ -1,9 +1,9 @@
 {% include base_path %}
 
 {% if post.header.teaser %}
-  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% capture teaser %}{{ post.header.teaser }}{% endcapture %}
 {% else %}
-  {% assign teaser = site.teaser %}
+{% assign teaser = site.teaser %}
 {% endif %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -11,6 +11,7 @@
 <div id="copy-notification" style="display:none;">
   <span id="copy-notification-message">Citation copied to clipboard!</span>
 </div>
+
 <style>
   #copy-notification {
     position: fixed;
@@ -35,7 +36,6 @@
     gap: 10px; /* Space between the buttons */
     margin: 10px 0;
   }
-
   .download-link a {
     display: inline-flex;
     align-items: center;
@@ -43,7 +43,7 @@
     font-size: 12px;
     color: #76a7d5;
     border: 3px solid #76a7d5; /* Add a thick border */
-    text-decoration: none;
+    text-decoration: none; /* Remove underline */
     padding: 4px 8px;
     border-radius: 5px;
     background-color: #ffffff; /* Set the background to white */
@@ -53,100 +53,111 @@
   .download-link a i {
     margin-right: 8px;
     font-size: 18px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
 
   .download-link a:hover {
-    background-color: #76a7d5;
-    color: #ffffff;
+    background-color: #76a7d5; /* Background changes to match the border color */
+    color: #ffffff; /* Text color changes to white */
     border-color: #76a7d5;
+    text-decoration: none; /* Ensure no underline appears on hover */
   }
-
 
 </style>
-<div class="{{ include.type | default: list__item}}">
-    <div style="display: inline-flex; width: 100%" >
-      <div style="width: 25%; align-self: center" >
-        <img style="padding: 0px 7px 5px 0px" src="{{ post.image }}">
-      </div>
-      <div style="width: 70%">
-        <h3 itemprop="headline" style="margin: 0.5em 0 0.5em;">
-          {% if post.link %}
-            <a href="{{ post.link }}">{{ post.title }}</a> <a href="{{ base_path }}{{ post.url }}" rel="permalink"><i class="fa fa-link" aria-hidden="true" title="permalink" ></i><span class="sr-only">Permalink</span></a>
-          {% else %}
-            <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
-          {% endif %}
-        </h3>
-        <p style="margin: 0px 0 0.3em; font-size: 0.8em; line-height: 1"><i>{{ post.venue }}</i>, {{ post.date | default: "1900-01-01" | date: "%Y" }} </p>
-        <div class="download-links">
-          {% if post.paperurl %}
-          <div class="download-link">
-            <a href="{{ post.paperurl }}" target="_blank">
-              <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
-            </a>
-          </div>
-          {% endif %}
 
-          {% if post.slidesurl %}
-          <div class="download-link">
-            <a href="{{ post.slidesurl }}" target="_blank">
-              <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
-            </a>
-          </div>
-          {% endif %}
-
-          {% if post.posterurl %}
-          <div class="download-link">
-            <a href="{{ post.posterurl }}" target="_blank">
-              <i class="fa fa-image" aria-hidden="true"></i> Poster
-            </a>
-          </div>
-          {% endif %}
-
-          {% if post.codeurl %}
-          <div class="download-link">
-            <a href="{{ post.codeurl }}" target="_blank">
-              <i class="fa fa-code" aria-hidden="true"></i> Code
-            </a>
-          </div>
-          {% endif %}
-          {% if post.bibtex %}
-          <div class="download-link">
-            <a href="javascript:void(0);" onclick="copyCitation('{{ post.id }}')">
-              <i class="fa fa-clipboard" aria-hidden="true"></i> bib
-            </a>
-          </div>
-          {% endif %}
-<!--          {% if post.citation %}-->
-<!--          <p id="citation-{{ post.id }}" style-="display:none;">{{ post.citation }}</p>-->
-<!--          {% endif %}-->
-
-        </div>
-      </div>
+<div class="{{ include.type | default: list__item }}">
+  <div style="display: inline-flex; width: 100%">
+    <div style="width: 25%; align-self: center">
+      <img style="padding: 0px 7px 5px 0px" src="{{ post.image }}">
     </div>
+    <div style="width: 70%">
+      <h3 itemprop="headline" style="margin: 0.5em 0 0.5em;">
+        {% if post.link %}
+        <a href="{{ post.link }}">{{ post.title }}</a>
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">
+          <i class="fa fa-link" aria-hidden="true" title="permalink"></i>
+          <span class="sr-only">Permalink</span>
+        </a>
+        {% else %}
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
+        {% endif %}
+      </h3>
+      <p style="margin: 0px 0 0.3em; font-size: 0.8em; line-height: 1">
+        <i>{{ post.venue }}</i>, {{ post.date | default: "1900-01-01" | date: "%Y" }}
+      </p>
+      <div class="download-links">
+        {% if post.paperurl %}
+        <div class="download-link">
+          <a href="{{ post.paperurl }}" target="_blank">
+            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
+          </a>
+        </div>
+        {% endif %}
 
+        {% if post.slidesurl %}
+        <div class="download-link">
+          <a href="{{ post.slidesurl }}" target="_blank">
+            <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
+          </a>
+        </div>
+        {% endif %}
+
+        {% if post.posterurl %}
+        <div class="download-link">
+          <a href="{{ post.posterurl }}" target="_blank">
+            <i class="fa fa-image" aria-hidden="true"></i> Poster
+          </a>
+        </div>
+        {% endif %}
+
+        {% if post.codeurl %}
+        <div class="download-link">
+          <a href="{{ post.codeurl }}" target="_blank">
+            <i class="fa fa-code" aria-hidden="true"></i> Code
+          </a>
+        </div>
+        {% endif %}
+
+        {% if post.bibtex %}
+        <div class="download-link">
+          <a href="javascript:void(0);" onclick="copyCitation('{{ post.id }}')">
+            <i class="fa fa-clipboard" aria-hidden="true"></i> bib
+          </a>
+        </div>
+        <p id="bibtex-{{ post.id }}" style="display:none;">{{ post.bibtex }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
 </div>
+<script>
+  function copyCitation(postId) {
+    const citationElement = document.getElementById(`bibtex-${postId}`);
 
-  <script>
-    function copyCitation(postId) {
-    const citationText = document.getElementById(`citation-${postId}`).innerText;
+    if (citationElement) {
+      const citationText = citationElement.innerText;
 
-    // Create a temporary element to hold the text
-    const tempElement = document.createElement('textarea');
-    tempElement.value = citationText;
-    document.body.appendChild(tempElement);
+      // Create a temporary element to hold the text
+      const tempElement = document.createElement('textarea');
+      tempElement.value = citationText;
+      document.body.appendChild(tempElement);
 
-    // Select and copy the text
-    tempElement.select();
-    document.execCommand('copy');
+      // Select and copy the text
+      tempElement.select();
+      document.execCommand('copy');
 
-    // Remove the temporary element
-    document.body.removeChild(tempElement);
+      // Remove the temporary element
+      document.body.removeChild(tempElement);
 
-    // Show custom notification
-    showNotification('Citation copied to clipboard!');
+      // Show custom notification
+      showNotification('Citation copied to clipboard!');
+    } else {
+      console.error('Citation element not found');
+    }
   }
 
-    function showNotification(message) {
+  function showNotification(message) {
     const notification = document.getElementById('copy-notification');
     const notificationMessage = document.getElementById('copy-notification-message');
 
@@ -156,12 +167,10 @@
 
     // Hide the notification after 3 seconds
     setTimeout(() => {
-    notification.style.opacity = '0';
-    setTimeout(() => {
-    notification.style.display = 'none';
-  }, 300); // Wait for the fade-out transition to complete
-  }, 3000); // Show notification for 3 seconds
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 300); // Wait for the fade-out transition to complete
+    }, 3000); // Show notification for 3 seconds
   }
 </script>
-
-
