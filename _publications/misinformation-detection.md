@@ -6,6 +6,7 @@ excerpt: 'In this work we introduce a persuasive strategy detection dataset and 
 date: 2024-05-01
 venue: 'Joint International Conference on Computational Linguistics, Language Resources and Evaluation'
 image: "files/misinformation-detection/img.png"
+header: "files/misinformation-detection/header.png"
 paperurl: 'https://aclanthology.org/2024.lrec-main.1501.pdf'
 slidesurl: "files/misinformation-detection/slides.pdf"
 posterurl: "files/misinformation-detection/poster.pdf"

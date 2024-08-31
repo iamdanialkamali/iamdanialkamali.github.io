@@ -14,64 +14,110 @@ layout: default
   {% endunless %}
 {% endif %}
 
+<div id="copy-notification" style="display:none;">
+  <span id="copy-notification-message">Citation copied to clipboard!</span>
+</div>
+
 <style>
-  .bibtex-container {
-    background-color: #f9f9f9;
-    padding: 15px;
+  #copy-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px;
     border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    max-width: 800px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
   }
 
-  .bibtex-entry {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    background-color: #eee;
-    padding: 10px;
-    border-radius: 4px;
-    white-space: pre-wrap;
-    overflow-x: auto;
-    margin: 10px 0 0;
+  .download-links {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    margin: 10px 0;
+    flex-wrap: wrap;
   }
-
-  .copy-bibtex-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 12px;
+  .download-links div {
+    display: flex;
+  }
+  .download-link a {
+    display: inline-flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #76a7d5;
+    border: 3px solid #76a7d5; /* Add a thick border */
+    text-decoration: none; /* Remove underline */
+    padding: 4px 8px;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    background-color: #ffffff; /* Set the background to white */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
 
-  .copy-bibtex-btn:hover {
-    background-color: #0056b3;
+  .download-link a i {
+    margin-right: 8px;
+    font-size: 18px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .download-link a:hover {
+    background-color: #76a7d5; /* Background changes to match the border color */
+    color: #ffffff; /* Text color changes to white */
+    border-color: #76a7d5;
+    text-decoration: none; /* Ensure no underline appears on hover */
   }
 
 </style>
-
 <script>
-  function copyBibtex(elementId) {
-    const bibtexEntry = document.getElementById(elementId).innerText;
+  function copyCitation(postId) {
+    const citationElement = document.getElementById(`bibtex-${postId}`);
 
-    // Create a temporary textarea to hold the BibTeX text
-    const tempTextarea = document.createElement('textarea');
-    tempTextarea.value = bibtexEntry;
-    document.body.appendChild(tempTextarea);
+    if (citationElement) {
+      const citationText = citationElement.innerText;
 
-    // Select and copy the text
-    tempTextarea.select();
-    document.execCommand('copy');
+      // Create a temporary element to hold the text
+      const tempElement = document.createElement('textarea');
+      tempElement.value = citationText;
+      document.body.appendChild(tempElement);
 
-    // Remove the temporary textarea
-    document.body.removeChild(tempTextarea);
+      // Select and copy the text
+      tempElement.select();
+      document.execCommand('copy');
 
-    // Optional: Provide feedback to the user
-    alert('BibTeX entry copied to clipboard!');
+      // Remove the temporary element
+      document.body.removeChild(tempElement);
+
+      // Show custom notification
+      showNotification('Citation copied to clipboard!');
+    } else {
+      console.error('Citation element not found');
+    }
   }
 
+  function showNotification(message) {
+    const notification = document.getElementById('copy-notification');
+    const notificationMessage = document.getElementById('copy-notification-message');
+
+    notificationMessage.textContent = message;
+    notification.style.display = 'block';
+    notification.style.opacity = '1';
+
+    // Hide the notification after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 300); // Wait for the fade-out transition to complete
+    }, 3000); // Show notification for 3 seconds
+  }
 </script>
+
 
 <div id="main" role="main">
   {% include sidebar.html %}
@@ -89,18 +135,65 @@ layout: default
           {% if page.read_time %}
             <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> {% include read-time.html %}</p>
           {% endif %}
-        {% if page.modified %}
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Published:" }}</strong> <time datetime="{{ page.modified | date: "%Y-%m-%d" }}">{{ page.modified | date: "%B %d, %Y" }}</time></p>
-        {% endif %}
+          {% if page.modified %}
+            <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Published:" }}</strong> <time datetime="{{ page.modified | date: "%Y-%m-%d" }}">{{ page.modified | date: "%B %d, %Y" }}</time></p>
+          {% endif %}
         
-        {% if page.collection == 'teaching' %}
-          <p> {{ page.type }}, <i>{{ page.venue }}</i>, {{ page.date | default: "1900-01-01" | date: "%Y" }} </p>
-        {% elsif page.venue and page.date %}
-          <p>Published in <i>{{ page.venue }}</i>, {{ page.date | default: "1900-01-01" | date: "%Y" }} </p>
-        {% elsif page.date %}
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Published:" }}</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | default: "1900-01-01" | date: "%B %d, %Y" }}</time></p>
-        {% endif %}    
+          {% if page.collection == 'teaching' %}
+            <p> {{ page.type }}, <i>{{ page.venue }}</i>, {{ page.date | default: "1900-01-01" | date: "%Y" }} </p>
+          {% elsif page.venue and page.date %}
+            <p><i>{{ page.venue }}</i>, {{ page.date | default: "1900-01-01" | date: "%Y" }} </p>
+          {% elsif page.date %}
+            <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Published:" }}</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | default: "1900-01-01" | date: "%B %d, %Y" }}</time></p>
+          {% endif %}
+          <div class="download-links">
+            {% if page.paperurl %}
+            <div class="download-link">
+              <a href="{{ page.paperurl }}" target="_blank">
+                <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.slidesurl %}
+            <div class="download-link">
+              <a href="{{ base_path }}/{{ page.slidesurl }}" target="_blank">
+                <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.posterurl %}
+            <div class="download-link">
+              <a href="{{ base_path }}/{{ page.posterurl }}" target="_blank">
+                <i class="fa fa-image" aria-hidden="true"></i> Poster
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.codeurl %}
+            <div class="download-link">
+              <a href="{{ page.codeurl }}" target="_blank">
+                <i class="fa fa-code" aria-hidden="true"></i> Code
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.bibtex %}
+            <div class="download-link">
+              <a href="javascript:void(0);" onclick="copyCitation('{{ page.id }}')">
+                <i class="fa fa-clipboard" aria-hidden="true"></i> bib
+              </a>
+            </div>
+            <p id="bibtex-{{ page.id }}" style="display:none;">{{ page.bibtex }}</p>
+            {% endif %}
+          </div>
+          {% if page.header %}
+          <img src="{{ base_path }}/{{ page.header }}">
+          {% endif %}
         </header>
+
+
       {% endunless %}
 
       <section class="page__content" itemprop="text">
