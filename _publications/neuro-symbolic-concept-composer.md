@@ -93,10 +93,7 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
     - This undervaluation results in a biased composition that fails to accurately reflect the true relationship between the combined concepts.
 
 - **Advantages of Soft Composition**:
-  - **Normalized Predicate Scores**:
-    - Soft composition utilizes normalized predicate scores, mitigating the issues caused by varying score ranges.
-  - **Enhanced Relationship Representation**:
-    - Ensures that the composition of concepts accurately represents their true relationships without bias.
+    - **Normalized Predicate Scores**: Soft composition utilizes normalized predicate scores, mitigating the issues caused by varying score ranges.
 
 
 <div>
