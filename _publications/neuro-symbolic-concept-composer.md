@@ -7,7 +7,7 @@ date: 2025-01-01
 venue: 'Association for the Advancement of Artificial Intelligence (AAAI)'
 image: "files/misinformation-detection/img.png"
 header: "files/neuro-symbolic-concept-composer/pipeline.svg"
-paperurl: 'https://iamdanialkamali.github.io//publication/neuro-symbolic-concept-composer'
+paperurl: 'https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer'
 slidesurl: "https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer"
 posterurl: "https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer"
 codeurl: "https://github.com/HLR/NeSyCoCo"
@@ -35,19 +35,19 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 - **Language-to-Program Module**: Converts natural language queries into symbolic programs using **dependency parsing**.
   <div style="text-align: center;">
     <img style="width: 50%; margin: 2em 0em 1em 0em;" src="../files/neuro-symbolic-concept-composer/language_to_program.svg" alt="Figure 2 illustrates the language-to-program process">
-    <p><em>Figure 2: Language-to-Program Process</em></p>
+    <p><em>Language-to-Program process</em></p>
   </div>
 - **Perception Module**: Extracts visual features and relationships from images via models like Mask RCNN.
 - **Differentiable Executor**: Executes symbolic programs with soft composition for robust generalization.
   - **Predicate Functions**:
     <div style="text-align: center;">
       <img style="width: 80%; margin: 2em 0em 1em 0em;" src="../files/neuro-symbolic-concept-composer/predicate_function.svg" alt="Figure 3 illustrates the First-Order Logic functions">
-      <p><em>Figure 3: First-Order Logic Functions</em></p>
+      <p><em>Generalizable predicate function compared to LEFT</em></p>
     </div>
   - **First-Order-Logic Function**
     <div style="text-align: center;">
       <img style="width: 80%; margin: 2em 0em 1em 0em;" src="../files/neuro-symbolic-concept-composer/fol_functions.png" alt="Figure 3 illustrates the First-Order Logic functions">
-      <p><em>Figure 3: First-Order Logic Functions</em></p>
+      <p><em>FOL functions</em></p>
     </div>
 ---
 
@@ -58,18 +58,6 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
     - Outperformed baselines with **97.3% accuracy** on relative clause and spatial reasoning splits.
 - **CLEVR-CoGenT (Table 3)**:
     - Achieved **78.8% accuracy** on unseen attribute combinations in Split B.
-
-<div style="display: inline-flex; justify-content: center; gap: 20px;">
-  <div style="text-align: center;">
-    <img src="../files/neuro-symbolic-concept-composer/box_plot_left.svg" alt="Figure 4.1 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
-    <p><em>Figure 4.1:  LEFT Predicate Score Distribution</em></p>
-  </div>
-  <div style="text-align: center;">
-    <img src="../files/neuro-symbolic-concept-composer/box_plot_nesycoco.svg" alt="Figure 4.2 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
-    <p><em>Figure 4.2: NeSyCoCo Predicate Score Distribution</em></p>
-  </div>
-</div>
-
 ---
 
 ### **2. Vision-Language Reasoning**
@@ -87,7 +75,41 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 
 <div style="text-align: center;">
   <img style="width: 70%" src="../files/neuro-symbolic-concept-composer/correlation.svg" alt="Figure 5 demonstrates the relationship between predicate embeddings’ similarity and generalization accuracy">
-  <p><em>Figure 5: Predicate Embeddings Similarity vs. Generalization Accuracy</em></p>
+  <p><em>Figure 5: Predicate Embeddings Similarity vs. Pearson Correlation of Predicate Score</em></p>
+</div>
+
+### 4. Why soft composition?
+- **Comparison of Concept Scores**:
+  - Presented boxplots compare concept scores of LEFT and NeSyCoCo using 10k CLEVR validation samples.
+
+- **Variability in Score Ranges**:
+  - Different concepts exhibit significantly varying score ranges, leading to inconsistencies.
+
+- **Challenges with Min Function**:
+  - **Undervaluation of Specific Concepts**:
+    - When composing concepts (e.g., `red` and `rubber`) using a *min* function, the score for one concept (e.g., "red") is often undervalued.
+  - **Biased Composition**:
+    - This undervaluation results in a biased composition that fails to accurately reflect the true relationship between the combined concepts.
+
+- **Advantages of Soft Composition**:
+  - **Normalized Predicate Scores**:
+    - Soft composition utilizes normalized predicate scores, mitigating the issues caused by varying score ranges.
+  - **Enhanced Relationship Representation**:
+    - Ensures that the composition of concepts accurately represents their true relationships without bias.
+
+
+<div>
+<div style="display: inline-flex; justify-content: center; gap: 20px; text-align: center;">
+  <div style="text-align: center;">
+    <img src="../files/neuro-symbolic-concept-composer/box_plot_left.svg" alt="Figure 4.1 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
+  </div>
+  <div style="text-align: center;">
+    <img src="../files/neuro-symbolic-concept-composer/box_plot_nesycoco.svg" alt="Figure 4.2 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
+  </div>
+</div>
+<div style="text-align: center;">
+<p><em>NeSyCoCo predicate score box plot compared to LEFT (Dotted and solid lines represent the mean and median, respectively) </em></p>
+</div>
 </div>
 
 ---
