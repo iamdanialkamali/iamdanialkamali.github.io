@@ -58,6 +58,7 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
     - Outperformed baselines with **97.3% accuracy** on relative clause and spatial reasoning splits.
 - **CLEVR-CoGenT (Table 3)**:
     - Achieved **78.8% accuracy** on unseen attribute combinations in Split B.
+
 ---
 
 ### **2. Vision-Language Reasoning**
