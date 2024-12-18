@@ -80,6 +80,21 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 </div>
 
 ### 4. Why soft composition?
+
+<div>
+<div style="display: inline-flex; justify-content: center; gap: 20px; text-align: center;">
+  <div style="text-align: center;">
+    <img src="../files/neuro-symbolic-concept-composer/box_plot_left.svg" alt="Figure 4.1 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
+  </div>
+  <div style="text-align: center;">
+    <img src="../files/neuro-symbolic-concept-composer/box_plot_nesycoco.svg" alt="Figure 4.2 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
+  </div>
+</div>
+<div style="text-align: center;">
+<p><em>NeSyCoCo predicate score box plot compared to LEFT (Dotted and solid lines represent the mean and median, respectively) </em></p>
+</div>
+</div>
+
 - **Comparison of Concept Scores**:
   - Presented boxplots compare concept scores of LEFT and NeSyCoCo using 10k CLEVR validation samples.
 
@@ -95,20 +110,6 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 - **Advantages of Soft Composition**:
     - **Normalized Predicate Scores**: Soft composition utilizes normalized predicate scores, mitigating the issues caused by varying score ranges.
 
-
-<div>
-<div style="display: inline-flex; justify-content: center; gap: 20px; text-align: center;">
-  <div style="text-align: center;">
-    <img src="../files/neuro-symbolic-concept-composer/box_plot_left.svg" alt="Figure 4.1 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
-  </div>
-  <div style="text-align: center;">
-    <img src="../files/neuro-symbolic-concept-composer/box_plot_nesycoco.svg" alt="Figure 4.2 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
-  </div>
-</div>
-<div style="text-align: center;">
-<p><em>NeSyCoCo predicate score box plot compared to LEFT (Dotted and solid lines represent the mean and median, respectively) </em></p>
-</div>
-</div>
 
 ---
 
