@@ -199,7 +199,9 @@ layout: default
             {% endif %}
           </div>
           {% if page.header %}
-          <img src="{{ base_path }}/{{ page.header }}">
+          <div style="display: flex; justify-content: center; align-items: center;">
+          <img style="width: 100%" src="{{ base_path }}/{{ page.header }}">
+          </div>
           {% endif %}
         </header>
 
