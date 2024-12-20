@@ -88,7 +88,7 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 
 - **Challenges with Min Function**:
   - **Undervaluation of Specific Concepts**:
-    - When composing concepts (e.g., `red` and `rubber`) using a *min* function, the score for one concept (e.g., "red") is often undervalued.
+    - When composing concepts (e.g., `red` and `rubber`) using a *min* function, the score for one concept (e.g., `red`) is often undervalued.
   - **Biased Composition**:
     - This undervaluation results in a biased composition that fails to accurately reflect the true relationship between the combined concepts.
 
