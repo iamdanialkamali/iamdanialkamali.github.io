@@ -98,10 +98,10 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 
 <div>
 <div style="display: inline-flex; justify-content: center; gap: 20px; text-align: center;">
-  <div style="text-align: center;">
+  <div style="text-align: center; width: 100%;">
     <img src="../files/neuro-symbolic-concept-composer/box_plot_left.svg" alt="Figure 4.1 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
   </div>
-  <div style="text-align: center;">
+  <div style="text-align: center; width: 100%;">
     <img src="../files/neuro-symbolic-concept-composer/box_plot_nesycoco.svg" alt="Figure 4.2 compares NeSyCoCo’s normalized predicate scores with the previous LEFT method.">
   </div>
 </div>
