@@ -2,14 +2,11 @@
 title: "NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization"
 collection: publications
 permalink: /publication/neuro-symbolic-concept-composer
-image: "files/neuro-symbolic-concept-composer/nesycoco-framework.png"
 date: 2025-01-01
 venue: 'Association for the Advancement of Artificial Intelligence (AAAI)'
 image: "files/neuro-symbolic-concept-composer/img.png"
 header: "files/neuro-symbolic-concept-composer/pipeline.svg"
-paperurl: 'https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer'
-slidesurl: "https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer"
-posterurl: "https://iamdanialkamali.github.io/publication/neuro-symbolic-concept-composer"
+paperurl: 'https://arxiv.org/abs/2412.15588'
 codeurl: "https://github.com/HLR/NeSyCoCo"
 citation: |
   @inproceedings{kamali2025nesycoco,
