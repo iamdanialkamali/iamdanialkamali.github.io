@@ -4,7 +4,7 @@ collection: publications
 permalink: /publication/neuro-symbolic-concept-composer
 date: 2025-01-01
 venue: 'Association for the Advancement of Artificial Intelligence (AAAI)'
-image: "files/neuro-symbolic-concept-composer/img.png"
+image: "files/neuro-symbolic-concept-composer/img.svg"
 header: "files/neuro-symbolic-concept-composer/pipeline.svg"
 paperurl: 'https://arxiv.org/abs/2412.15588'
 codeurl: "https://github.com/HLR/NeSyCoCo"
