@@ -50,7 +50,7 @@
   }
 
   .download-link a i {
-    margin-right: 8px;
+    margin-right: 6px;
     font-size: 18px;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
@@ -67,18 +67,18 @@
 <div class="{{ include.type | default: list__item }}">
   <div style="display: inline-flex; width: 100%">
     <div style="width: 25%; align-self: center">
-      <img style="padding: 0px 7px 5px 0px" src="{{ base_path }}/{{ post.image }}">
+      <img style="padding: 0px 7px 5px 0px" src="{{ base_path }}/{{ post.image }}" alt="{{ post.title }}">
     </div>
     <div style="width: 70%">
       <h3 itemprop="headline" style="margin: 0.5em 0 0.5em;">
         {% if post.link %}
         <a href="{{ post.link }}">{{ post.title }}</a>
-        <a href="{{ base_path }}/{{ post.url }}" rel="permalink">
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">
           <i class="fa fa-link" aria-hidden="true" title="permalink"></i>
           <span class="sr-only">Permalink</span>
         </a>
         {% else %}
-        <a href="{{ base_path }}/{{ post.url }}" rel="permalink">{{ post.title }}</a>
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
         {% endif %}
       </h3>
       <p style="margin: 0px 0 0.3em; font-size: 0.8em; line-height: 1">

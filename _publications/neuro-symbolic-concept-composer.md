@@ -8,13 +8,16 @@ image: "files/neuro-symbolic-concept-composer/img.jpg"
 header: "files/neuro-symbolic-concept-composer/pipeline.svg"
 paperurl: 'https://arxiv.org/abs/2412.15588'
 codeurl: "https://github.com/HLR/NeSyCoCo"
-citation: |
-  @inproceedings{kamali2025nesycoco,
-    title={NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization},
-    author={Kamali, Danial and Barezi, Elham J. and Kordjamshidi, Parisa},
-    booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
-    year={2025}
-  }
+bibtex: "
+  @misc{kamali2024nesycoconeurosymbolicconceptcomposer,
+  title={NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization},
+  author={Danial Kamali and Elham J. Barezi and Parisa Kordjamshidi},
+  year={2024},
+  eprint={2412.15588},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2412.15588},
+}"
 ---
 ## **Abstract**
 NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalization in vision-language tasks and more specially **compositional generalization**.
@@ -119,5 +122,15 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
 3. **Distributed Predicate Representation**:
     - Addresses language variability using word representations from pre-trained encoders.
 
----
+```bibtex
+@misc{kamali2024nesycoconeurosymbolicconceptcomposer,
+      title={NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization}, 
+      author={Danial Kamali and Elham J. Barezi and Parisa Kordjamshidi},
+      year={2024},
+      eprint={2412.15588},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2412.15588}, 
+}
+```
 
