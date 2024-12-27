@@ -266,7 +266,8 @@ When we run benchmarks, we can see the performance advantage of using Triton.
 
 As we've seen from the benchmarks, while PyTorch offers excellent performance for smaller operations, Triton's ability to leverage the GPU's parallel processing capabilities truly shines when we move to larger tensor sizes. The crossover point, where Triton surpasses PyTorch in performance, is particularly noteworthy. In the realm of deep learning, where large matrix operations are commonplace, this is precisely where custom kernels can provide a significant edge.
 
-Note: Hyper-parameters such as BLOCK_SIZE are shown to be effective in the performance results. For this example, we assumed that the process is IO bounded and number of blocks wouldn't effect the performance  
+Note: Hyper-parameters such as BLOCK_SIZE are shown to be effective in the performance results. For this example, we assumed (with some preliminary test :) ) that the process is IO bounded and number of blocks wouldn't effect the performance.  
+
 ## Conclusion: Your Triton Journey Begins
 
 Congratulations! You've written and executed your first custom Triton kernels. You've learned about the basic structure of a Triton kernel, how to launch it, and how to handle memory access and parallelism.
