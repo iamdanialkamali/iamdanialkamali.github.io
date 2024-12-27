@@ -1,6 +1,6 @@
 ---
 title: 'Building Blocks for Deep Learning: Crafting an MLP with Triton'
-date: 2024-12-27
+date: 2024-12-26
 permalink: /posts/triton-mlp/
 tags:
   - Triton

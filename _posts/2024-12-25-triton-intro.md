@@ -1,6 +1,6 @@
 ---
 title: 'Building Blocks for Deep Learning: Your First Custom Kernel with Triton'
-date: 2024-03-28
+date: 2024-12-25
 permalink: /posts/triton-Intro/
 tags:
 - Triton
