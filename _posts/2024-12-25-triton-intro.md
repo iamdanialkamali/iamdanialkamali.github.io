@@ -44,35 +44,23 @@ Let's break down this diagram:
 
 1. **Kernel:** The kernel is the function (like our `add_scalar_kernel`) that we want to run in parallel. You can see it represented by a gray box in the image pointing to the code that will run in each thread.
 
-2. **Grid:** A grid is a collection of blocks. In the image, you see **Grid 1** and **Grid 2**, which in this case is only one dimension, but could have more. When you launch a kernel, you specify the grid dimensions, essentially saying how many blocks you want in each dimension. You can see two grids in light gray in the image.
+2. **Thread:** A thread is the basic unit of execution. Each thread executes the kernel code. In our diagram, each small box inside a block represents a thread, and each thread is responsible for processing one element (or a small chunk) of the input data. You can see them as white boxes inside the blocks, where the kernel code runs.
 
 3. **Block:** A block is a group of threads. Blocks are crucial because threads within a block can cooperate and share data through fast on-chip shared memory (not shown in this simplified diagram). In the diagram, each grid is divided into blocks, like **Block(0,0)** and **Block(1,0)**, which will run in parallel. Threads within a block are indexed using `threadIdx.x`, `threadIdx.y`, and `threadIdx.z` (for 3D blocks). You can see them in dark gray in the image, and how the indexing is made.
 
-4. **Thread:** A thread is the basic unit of execution. Each thread executes the kernel code. In our diagram, each small box inside a block represents a thread, and each thread is responsible for processing one element (or a small chunk) of the input data. You can see them as white boxes inside the blocks, where the kernel code runs.
+4. **Grid:** A grid is a collection of blocks. In the image, you see **Grid 1** and **Grid 2**, which in this case is only one dimension, but could have more. When you launch a kernel, you specify the grid dimensions, essentially saying how many blocks you want in each dimension. You can see two grids in light gray in the image.
 
-**Analogy:** Think of a grid as an apartment building, a block as a floor in that building, and each apartment on that floor as a thread. Each apartment (thread) can work independently, but apartments on the same floor (block) can easily share resources like heat and water.
-
-**Memory Hierarchy:**
-
-Now, where does the data reside, and how do threads access it? This is where the GPU's memory hierarchy comes into play:
-
-1. **Global Memory (DRAM):** This is the main memory of the GPU (labeled "DRAM" in the image). It's large but relatively slow to access. In our example, the input and output tensors would initially reside in global memory. You can see the DRAM in dark blue and the Global RAM in light blue. PyTorch interacts with the global memory when we create a tensor with `device='cuda'`.
-
-2. **L2 Cache:** This is a smaller, faster cache that sits between global memory and the streaming multiprocessors (SMs). It helps to reduce the latency of accessing global memory. You can see it in light gray connecting the SMs to the DRAM.
-
-3. **Streaming Multiprocessors (SMs) and L1 Cache:** SMs are the workhorses of the GPU. Each SM can execute multiple blocks concurrently. Each SM has a fast L1 cache (and shared memory, not shown here) that's used to store frequently accessed data, further reducing latency. You can see the SMs represented by diamond shapes and the L1 cache as a circle inside them.
-
-4. **Data:** Each thread will work with an element from the data, in our case from D1 to D6. You can see the data in the top right side of the image.
+When it comes to these concepts, I really like this **analogy**: Think of a grid as an apartment building, a block as a floor in that building, and each apartment on that floor as a thread. Each apartment (thread) can work independently, but apartments on the same floor (block) can easily share resources like heat and water.
 
 **Execution Flow:**
 
-When we launch our `add_scalar_kernel`, here's what happens conceptually, as demonstrated by the arrows in the image:
+When we launch our `add_scalar_kernel`, here's what happens conceptually:
 
-1. **Data Loading:** Threads in a block cooperatively load data from global memory (DRAM) into the L1 cache (and shared memory). The orange arrows going from DRAM to the L1 cache represent this initial data transfer. In addition, you can see another orange line connecting the Triton code with the data in the top right, to exemplify which data will be loaded.
+1. **Data Loading:** Threads in a block cooperatively load data from global memory (DRAM) into the cache (and shared memory). 
 
-2. **Computation:** Each thread performs its computation (adding the scalar to its assigned element). This happens within the SMs, utilizing the fast L1 cache.
+2. **Computation:** Each thread performs its computation (adding the scalar to its assigned element)
 
-3. **Data Writing:** After computation, the threads write the results back to global memory (DRAM). This is represented by the gray arrows going from each thread to its corresponding data element.
+3. **Data Writing:** After computation, the threads write the results back to global memory (DRAM). 
 
 **Why This Matters:**
 
