@@ -50,7 +50,7 @@ Let's break down this diagram:
 
 4. **Thread:** A thread is the basic unit of execution. Each thread executes the kernel code. In our diagram, each small box inside a block represents a thread, and each thread is responsible for processing one element (or a small chunk) of the input data. You can see them as white boxes inside the blocks, where the kernel code runs.
 
-**Analogy:** Think of a grid as an apartment building, a block as a floor in that building, and each apartment on that floor as a thread. Each apartment (thread) can work independently, but apartments on the same floor (block) can easily share resources.
+**Analogy:** Think of a grid as an apartment building, a block as a floor in that building, and each apartment on that floor as a thread. Each apartment (thread) can work independently, but apartments on the same floor (block) can easily share resources like heat and water.
 
 **Memory Hierarchy:**
 
