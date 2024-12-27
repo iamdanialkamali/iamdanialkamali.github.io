@@ -185,7 +185,7 @@ def add_scalar(output, input, scalar):
         BLOCK_SIZE=BLOCK_SIZE,
     )
 
-# Example usage (using a size divisible by BLOCK_SIZE):
+# Example usage (using a size divisible by BLOCK_SIZE but its not necessary):
 input_tensor = torch.rand(1024 * 5, device='cuda')
 output_tensor = torch.empty_like(input_tensor)
 scalar_value = 5.0
