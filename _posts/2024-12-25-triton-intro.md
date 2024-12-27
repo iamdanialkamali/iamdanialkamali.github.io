@@ -69,9 +69,7 @@ Understanding this execution model is essential for writing efficient GPU code. 
 
 ## Let's Go for Triton
 
-Now that we understood the building blocks and concepts, we can start on the rough idea of our `add_scalar_kernel`.
-
-For our `add_scalar_kernel`, each thread in each block will take one element from the input tensor, add the given scalar value to it, and then write the result to the corresponding position in the output tensor. Because we'll launch many blocks (and therefore many threads) in parallel, each instance can work on a different element of the tensor independently. This is how we achieve massive speedups on the GPU.
+Now that we understood the building blocks and concepts, we can start working on our add scalar kernel. In this kernel, each thread in each block will take one element from the input tensor, add the given scalar value to it, and then write the result to the corresponding position in the output tensor. Because we'll launch many blocks (and therefore many threads) in parallel, each instance can work on a different element of the tensor independently. This is how we achieve massive speedups on the GPU.
 
 **Inputs and Outputs of Our Kernel**
 
