@@ -123,14 +123,6 @@ NeSyCoCo is a neuro-symbolic visual reasoning framework that tackles generalizat
     - Addresses language variability using word representations from pre-trained encoders.
 
 ```bibtex
-@misc{kamali2024nesycoconeurosymbolicconceptcomposer,
-      title={NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization}, 
-      author={Danial Kamali and Elham J. Barezi and Parisa Kordjamshidi},
-      year={2024},
-      eprint={2412.15588},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2412.15588}, 
-}
+@article{Kamali_Barezi_Kordjamshidi_2025, title={NeSyCoCo: A Neuro-Symbolic Concept Composer for Compositional Generalization}, volume={39}, url={https://ojs.aaai.org/index.php/AAAI/article/view/32439}, DOI={10.1609/aaai.v39i4.32439} number={4}, journal={Proceedings of the AAAI Conference on Artificial Intelligence}, author={Kamali, Danial and Barezi, Elham J. and Kordjamshidi, Parisa}, year={2025}, month={Apr.}, pages={4184-4193} }
 ```
 
