@@ -26,6 +26,17 @@ layout: default
     text-align: center;
     font-size: 1.5em !important;
   }
+  .page__authors {
+    text-align: center;
+    font-size: 1.15em;
+    margin: 0.2em 0 0.1em;
+  }
+  .page__affiliations {
+    text-align: center;
+    font-size: 0.95em;
+    color: #6c757d;
+    margin: 0 0 0.6em;
+  }
 
   #copy-notification {
     position: fixed;
@@ -92,19 +103,19 @@ layout: default
     if (citationElement) {
       const citationText = citationElement.innerText;
 
-      // Create a temporary element to hold the text
+      /* Create a temporary element to hold the text */
       const tempElement = document.createElement('textarea');
       tempElement.value = citationText;
       document.body.appendChild(tempElement);
 
-      // Select and copy the text
+      /* Select and copy the text */
       tempElement.select();
       document.execCommand('copy');
 
-      // Remove the temporary element
+      /* Remove the temporary element */
       document.body.removeChild(tempElement);
 
-      // Show custom notification
+      /* Show custom notification */
       showNotification('Citation copied to clipboard!');
     } else {
       console.error('Citation element not found');
@@ -119,13 +130,13 @@ layout: default
     notification.style.display = 'block';
     notification.style.opacity = '1';
 
-    // Hide the notification after 3 seconds
+    /* Hide the notification after 3 seconds */
     setTimeout(() => {
       notification.style.opacity = '0';
       setTimeout(() => {
         notification.style.display = 'none';
-      }, 300); // Wait for the fade-out transition to complete
-    }, 3000); // Show notification for 3 seconds
+      }, 300); /* Wait for the fade-out transition to complete */
+    }, 3000); /* Show notification for 3 seconds */
   }
 </script>
 
@@ -143,6 +154,8 @@ layout: default
       {% unless page.header.overlay_color or page.header.overlay_image %}
         <header>
           {% if page.title %}<h1 class="page__title" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
+          {% if page.authors %}<p class="page__authors">{{ page.authors }}</p>{% endif %}
+          {% if page.affiliations %}<p class="page__affiliations">{{ page.affiliations }}</p>{% endif %}
           {% if page.read_time %}
             <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> {% include read-time.html %}</p>
           {% endif %}
@@ -162,6 +175,14 @@ layout: default
             <div class="download-link">
               <a href="{{ page.paperurl }}" target="_blank">
                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.arxivurl %}
+            <div class="download-link">
+              <a href="{{ page.arxivurl }}" target="_blank">
+                <i class="ai ai-arxiv" aria-hidden="true"></i> arXiv
               </a>
             </div>
             {% endif %}
@@ -186,6 +207,14 @@ layout: default
             <div class="download-link">
               <a href="{{ page.codeurl }}" target="_blank">
                 <i class="fa fa-code" aria-hidden="true"></i> Code
+              </a>
+            </div>
+            {% endif %}
+
+            {% if page.dataseturl %}
+            <div class="download-link">
+              <a href="{{ page.dataseturl }}" target="_blank">
+                <i class="fa fa-database" aria-hidden="true"></i> Dataset
               </a>
             </div>
             {% endif %}
