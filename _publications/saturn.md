@@ -35,15 +35,14 @@ bibtex: '@misc{kamali2026saturnsymbolicspatialreasoning,
 
 <h2 id="example">One example, step by step</h2>
 
-<p class="sat-lead">This walkthrough follows one question from 3D FORCE that SATURN answers correctly, while GPT-5.1, Gemini-3.1-Pro, Qwen3.5-9B, and Qwen3-VL-8B all answer incorrectly. Answering the question requires two frames of reference: the bus's own view and camera&nbsp;0's view. Press <b>&#9654;</b> to play or pause, use the numbered steps to jump, and drag the 3D view to rotate the scene while the animation is paused.</p>
+<p class="sat-lead">This walkthrough follows one 3D FORCE question from start to finish. The question combines camera&nbsp;0&rsquo;s view with the pickup truck&rsquo;s own view, and SATURN finds the right sedan. Press <b>&#9654;</b> to play or pause, use the numbered steps to jump, and drag the 3D view to rotate the scene while the animation is paused.</p>
 
 <div id="sat-demo" class="sat-demo" data-src="{{ site.baseurl }}/files/saturn/example/">
 <p class="sd-loading">Loading the example&hellip;</p>
 <noscript><p>The walkthrough needs JavaScript. Camera 0 of the example:</p><img src="{{ site.baseurl }}/files/saturn/img.jpg" alt="Camera 0 view of the example scene with SATURN's answer boxed in green"></noscript>
 </div>
 
-<p class="sat-note">The detections, the reconstructed scene and cameras, and the program come from one SATURN run of the released code (seed 0; Qwen3-VL-8B as the VLM, SAM3, VGGT and Orient Anything V2 for perception), and every score comes from the execution trace of that run. The ground shading shows only which side each frame calls &ldquo;behind&rdquo;, while the numbers are the predicate values.</p>
-<p class="sat-note">The baseline answers are the models' own outputs from the paper's evaluation, scored by the paper's rule (IoU &gt; 0.5). This question comes from the &ldquo;Obj + One-Cam&rdquo; REF setting, which combines one object frame with one camera frame. In that setting, SATURN reaches 73% and Gemini-3.1-Pro reaches 41% (Figure 4 of the paper).</p>
+<p class="sat-note">In this setting, one camera frame paired with one object frame, SATURN reaches 73% on 3D FORCE REF, against 41% for Gemini-3.1-Pro (Figure 4 of the paper).</p>
 
 <h2 id="perspectives">The same scene from each perspective</h2>
 
