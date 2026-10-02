@@ -6,6 +6,7 @@ excerpt: 'NePTune translates a question into a Python program that combines impe
 date: 2026-01-26
 venue: 'International Conference on Learning Representations (ICLR)'
 authors: 'Danial Kamali, Parisa Kordjamshidi'
+award: 'Best Paper Award, MSLD 2026'
 highlight: 'Oral, SpaVLE Workshop @ NeurIPS 2025'
 image: "files/neptune/img.jpg"
 header: "files/neptune/overview.webp"
