@@ -44,16 +44,6 @@ bibtex: '@misc{kamali2026saturnsymbolicspatialreasoning,
 
 <p class="sat-note">In this setting, one camera frame paired with one object frame, SATURN reaches 73% on 3D FORCE REF, against 41% for Gemini-3.1-Pro (Figure 4 of the paper).</p>
 
-<h2 id="perspectives">The same scene from each perspective</h2>
-
-<p>To make the two frames of reference concrete, we rendered the example scene again with the 3D FORCE generator. The camera visits the three input views, rises to a bird's-eye view with the bus facing the top of the picture, and then returns to camera&nbsp;0. The clip uses the benchmark's ground-truth scene to show what the question means, not what SATURN estimated. SATURN only sees the three input views.</p>
-
-<div id="sat-video" class="sat-video" data-segments='[[0.0, 0.5833, "Camera 0, one of the three input views"], [0.5833, 2.5833, "Moving to camera 1"], [2.5833, 3.0, "Camera 1"], [3.0, 5.0, "Moving to camera 2"], [5.0, 5.4167, "Camera 2"], [5.4167, 7.4167, "Moving back to camera 0"], [7.4167, 7.8333, "Camera 0"], [7.8333, 10.3333, "Rising and turning into the bus&#39;s frame"], [10.3333, 11.8333, "Bus facing up: the lower half is behind the bus"], [11.8333, 14.3333, "Returning to camera 0"], [14.3333, 15.2, "From camera 0, behind the SUV means farther away than the SUV"]]'>
-<video muted playsinline loop controls preload="metadata" poster="{{ site.baseurl }}/files/saturn/perspective-change.jpg" aria-label="Rendered fly-through of the example scene from camera 0 to camera 1, camera 2, the bus's own frame, and back to camera 0"><source src="{{ site.baseurl }}/files/saturn/perspective-change.webm" type="video/webm"><source src="{{ site.baseurl }}/files/saturn/perspective-change.mp4" type="video/mp4"></video>
-<div class="sat-video-cap"><span></span></div>
-</div>
-<p class="sat-note">In the bus's frame, the green tank on the left in camera&nbsp;0 (the answer) lies in the lower half of the picture, behind the bus. The green tank on the right in camera&nbsp;0 lies in the upper half, so that tank is not behind the bus.</p>
-
 <h2 id="abstract">Abstract</h2>
 
 <p>Vision-Language Models (VLMs) remain unreliable when spatial reasoning requires composing relations whose meanings depend on frames of reference. Existing tool-augmented spatial reasoning methods make reasoning more explicit, but often rely on low-level geometric procedures and hard binary decisions over noisy perception. We propose SATURN, a neuro-symbolic framework for perspective-aware compositional spatial reasoning. SATURN reconstructs an approximate 3D scene, derives soft perspective-aware spatial predicates, and composes them with a training-free Pythonic symbolic executor, separating perception from reasoning while preserving uncertainty through multi-hop inference. We also introduce 3D FORCE, a diagnostic benchmark that controls reasoning depth, view, and perspective composition for spatial arrangement grounding (SAG) and referring expression grounding (REF). On 3D FORCE, VLMs and spatially trained models degrade sharply as depth and perspective complexity increase, whereas SATURN degrades the least and outperforms every baseline at each depth. On the real-world MindCube benchmark, SATURN achieves 78.06% overall accuracy, outperforming the strongest baseline by 14 percentage points.</p>
@@ -169,4 +159,3 @@ bibtex: '@misc{kamali2026saturnsymbolicspatialreasoning,
 
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="{{ site.baseurl }}/files/saturn/saturn-demo.js"></script>
-<script src="{{ site.baseurl }}/files/saturn/saturn-video.js"></script>
