@@ -301,11 +301,10 @@ async function main(root) {
     '<div>Object ' + ansId + ', the <b>' + esc(shortOf(ansId)) + '</b>, matching the ground truth (IoU ' + data.saturn.iou_gt.toFixed(2) + ').</div>' +
     '<div class="sd-card-m">3D FORCE REF accuracy 81.2%</div>'));
   featured.forEach((b, k) => {
-    const tag = b.model === 'Qwen3.5-9B' ? ' &middot; best VLM baseline' : '';
     verdict.appendChild(h('div', 'sd-card sd-card-bad',
       '<div class="sd-card-h"><span class="sd-num">' + (k + 1) + '</span> ' + esc(b.model) + ' <span class="sd-x">&#10007;</span></div>' +
       '<blockquote>&ldquo;' + esc(b.quote) + '&rdquo;</blockquote>' +
-      '<div class="sd-card-m">3D FORCE REF accuracy ' + b.ref_accuracy_table1.toFixed(1) + '%' + tag + '</div>'));
+      '<div class="sd-card-m">3D FORCE REF accuracy ' + b.ref_accuracy_table1.toFixed(1) + '%</div>'));
   });
   const runs = data.baseline_runs || { runs: 0, wrong: 0 };
   if (runs.runs && runs.runs === runs.wrong) {
