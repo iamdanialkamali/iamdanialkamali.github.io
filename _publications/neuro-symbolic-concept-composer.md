@@ -4,6 +4,7 @@ collection: publications
 permalink: /publication/neuro-symbolic-concept-composer
 date: 2025-01-01
 venue: 'Association for the Advancement of Artificial Intelligence (AAAI)'
+authors: 'Danial Kamali, Elham J. Barezi, Parisa Kordjamshidi'
 image: "files/neuro-symbolic-concept-composer/img.jpg"
 header: "files/neuro-symbolic-concept-composer/pipeline.svg"
 paperurl: 'https://arxiv.org/abs/2412.15588'

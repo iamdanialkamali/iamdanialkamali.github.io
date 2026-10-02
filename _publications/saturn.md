@@ -7,7 +7,8 @@ redirect_from:
 excerpt: 'SATURN answers frame-of-reference questions by running a short program of soft spatial predicates over an estimated 3D scene, and we also release 3D FORCE, a diagnostic benchmark for composing spatial relations across perspectives.'
 date: 2026-10-02
 venue: 'Conference on Empirical Methods in Natural Language Processing (EMNLP)'
-authors: 'Danial Kamali<sup>1</sup>, Tanawan Premsri<sup>1</sup>, Shreya Rajpal<sup>1</sup>, Amir Zadeh<sup>2</sup>, Chuan Li<sup>2</sup>, Parisa Kordjamshidi<sup>1</sup>'
+authors: 'Danial Kamali, Tanawan Premsri, Shreya Rajpal, Amir Zadeh, Chuan Li, Parisa Kordjamshidi'
+authors_page: 'Danial Kamali<sup>1</sup>, Tanawan Premsri<sup>1</sup>, Shreya Rajpal<sup>1</sup>, Amir Zadeh<sup>2</sup>, Chuan Li<sup>2</sup>, Parisa Kordjamshidi<sup>1</sup>'
 affiliations: '<sup>1</sup>Michigan State University &nbsp;&nbsp; <sup>2</sup>Lambda Labs'
 image: "files/saturn/img.jpg"
 paperurl: 'https://arxiv.org/pdf/2606.22694'

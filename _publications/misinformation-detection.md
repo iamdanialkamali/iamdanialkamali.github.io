@@ -5,6 +5,7 @@ permalink: /publication/misinformation-detection
 excerpt: 'In this work we introduce a persuasive strategy detection dataset and show using their labels can improve misinformation detection and explanation.'
 date: 2024-05-01
 venue: 'Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING)'
+authors: 'Danial Kamali, Joseph D. Romain, Huiyi Liu, Wei Peng, Jingbo Meng, Parisa Kordjamshidi'
 image: "files/misinformation-detection/img.png"
 header: "files/misinformation-detection/header.png"
 paperurl: 'https://aclanthology.org/2024.lrec-main.1501.pdf'

@@ -1,11 +1,7 @@
 {% include base_path %}
 
-{% if post.header.teaser %}
-{% capture teaser %}{{ post.header.teaser }}{% endcapture %}
-{% else %}
-{% assign teaser = site.teaser %}
-{% endif %}
-
+{% unless pub_list_assets_done %}
+{% assign pub_list_assets_done = true %}
 <div id="copy-notification" style="display:none;">
   <span id="copy-notification-message">Citation copied to clipboard!</span>
 </div>
@@ -16,8 +12,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #4caf50; /* Green background */
-    color: white; /* White text */
+    background-color: #4caf50;
+    color: white;
     padding: 10px 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -29,151 +25,118 @@
     text-align: center;
   }
 
-  .download-links {
+  .pub-item {
     display: flex;
-    gap: 10px; /* Space between the buttons */
-    margin: 10px 0;
-    flex-wrap: wrap;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #eef0f2;
   }
-  .download-link a {
+  .pub-item:last-of-type { border-bottom: 0; }
+  .pub-thumb {
+    flex: 0 0 210px;
+    width: 210px;
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7f9fb;
+    border: 1px solid #e3e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 6px;
+    box-sizing: border-box;
+  }
+  .pub-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .pub-body { flex: 1 1 auto; min-width: 0; }
+  .pub-title {
+    margin: 0 0 0.3em !important;
+    font-size: 1.05em !important;
+    line-height: 1.3 !important;
+  }
+  .pub-title a { text-decoration: none; }
+  .pub-title a:hover { text-decoration: underline; }
+  .pub-authors {
+    margin: 0 0 0.25em !important;
+    font-size: 0.85em !important;
+    line-height: 1.45;
+    color: #494e52;
+  }
+  .pub-authors b { color: #2c3e50; }
+  .pub-venue {
+    margin: 0 0 0.45em !important;
+    font-size: 0.8em !important;
+    line-height: 1.45;
+    color: #6c757d;
+  }
+  .pub-badge {
+    display: inline-block;
+    font-size: 11.5px;
+    line-height: 1.4;
+    padding: 1px 8px;
+    margin: 0 4px 2px 0;
+    border-radius: 999px;
+    border: 1px solid #c5d9ec;
+    background: #eef6fb;
+    color: #2c5d8a;
+    font-style: normal;
+    white-space: nowrap;
+  }
+  .pub-badge--award {
+    border-color: #f2c94c;
+    background: #fff8e1;
+    color: #8a6100;
+  }
+  .pub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pub-links a {
     display: inline-flex;
     align-items: center;
+    gap: 5px;
     font-family: Arial, sans-serif;
     font-size: 12px;
-    color: #76a7d5;
-    border: 3px solid #76a7d5; /* Add a thick border */
-    text-decoration: none; /* Remove underline */
-    padding: 4px 8px;
-    border-radius: 5px;
-    background-color: #ffffff; /* Set the background to white */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    line-height: 1;
+    color: #3d7ab8;
+    border: 1px solid #a9c8e6;
+    border-radius: 4px;
+    padding: 5px 8px;
+    background: #fff;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
-
-  .download-link a i {
-    margin-right: 6px;
-    font-size: 18px;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  .pub-links a i { font-size: 13px; }
+  .pub-links a:hover, .pub-links a:focus-visible {
+    background: #3d7ab8;
+    border-color: #3d7ab8;
+    color: #fff;
+    text-decoration: none;
   }
-
-  .download-link a:hover {
-    background-color: #76a7d5; /* Background changes to match the border color */
-    color: #ffffff; /* Text color changes to white */
-    border-color: #76a7d5;
-    text-decoration: none; /* Ensure no underline appears on hover */
+  @media (max-width: 600px) {
+    .pub-item { flex-direction: column; gap: 10px; }
+    .pub-thumb { flex: 0 0 auto; width: 100%; aspect-ratio: 21 / 9; }
   }
-
 </style>
 
-<div class="{{ include.type | default: list__item }}">
-  <div style="display: inline-flex; width: 100%">
-    <div style="width: 25%; align-self: center">
-      <img style="padding: 0px 7px 5px 0px" src="{{ base_path }}/{{ post.image }}" alt="{{ post.title }}">
-    </div>
-    <div style="width: 70%">
-      <h3 itemprop="headline" style="margin: 0.5em 0 0.5em;">
-        {% if post.link %}
-        <a href="{{ post.link }}">{{ post.title }}</a>
-        <a href="{{ base_path }}{{ post.url }}" rel="permalink">
-          <i class="fa fa-link" aria-hidden="true" title="permalink"></i>
-          <span class="sr-only">Permalink</span>
-        </a>
-        {% else %}
-        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
-        {% endif %}
-      </h3>
-      <p style="margin: 0px 0 0.3em; font-size: 0.8em; line-height: 1">
-        <i>{{ post.venue }}</i>, {{ post.date | default: "1900-01-01" | date: "%Y" }}
-      </p>
-      <div class="download-links">
-        {% if post.paperurl %}
-        <div class="download-link">
-          <a href="{{ post.paperurl }}" target="_blank">
-            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.arxivurl %}
-        <div class="download-link">
-          <a href="{{ post.arxivurl }}" target="_blank">
-            <i class="ai ai-arxiv" aria-hidden="true"></i> arXiv
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.slidesurl %}
-        <div class="download-link">
-          <a href="{{ base_path }}/{{ post.slidesurl }}" target="_blank">
-            <i class="fa fa-slideshare" aria-hidden="true"></i> Slides
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.posterurl %}
-        <div class="download-link">
-          <a href="{{ base_path }}/{{ post.posterurl }}" target="_blank">
-            <i class="fa fa-image" aria-hidden="true"></i> Poster
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.codeurl %}
-        <div class="download-link">
-          <a href="{{ post.codeurl }}" target="_blank">
-            <i class="fa fa-code" aria-hidden="true"></i> Code
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.dataseturl %}
-        <div class="download-link">
-          <a href="{{ post.dataseturl }}" target="_blank">
-            <i class="fa fa-database" aria-hidden="true"></i> Dataset
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.projecturl %}
-        <div class="download-link">
-          <a href="{{ base_path }}/{{ post.projecturl }}">
-            <i class="fa fa-globe" aria-hidden="true"></i> Project
-          </a>
-        </div>
-        {% endif %}
-
-        {% if post.bibtex %}
-        <div class="download-link">
-          <a href="javascript:void(0);" onclick="copyCitation('{{ post.id }}')">
-            <i class="fa fa-clipboard" aria-hidden="true"></i> BIB
-          </a>
-        </div>
-        <p id="bibtex-{{ post.id }}" style="display:none;">{{ post.bibtex }}</p>
-        {% endif %}
-      </div>
-
-    </div>
-  </div>
-</div>
 <script>
   function copyCitation(postId) {
     const citationElement = document.getElementById(`bibtex-${postId}`);
-
     if (citationElement) {
-      const citationText = citationElement.innerText;
-
-      /* Create a temporary element to hold the text */
       const tempElement = document.createElement('textarea');
-      tempElement.value = citationText;
+      tempElement.value = citationElement.innerText;
       document.body.appendChild(tempElement);
-
-      /* Select and copy the text */
       tempElement.select();
       document.execCommand('copy');
-
-      /* Remove the temporary element */
       document.body.removeChild(tempElement);
-
-      /* Show custom notification */
       showNotification('Citation copied to clipboard!');
     } else {
       console.error('Citation element not found');
@@ -183,17 +146,49 @@
   function showNotification(message) {
     const notification = document.getElementById('copy-notification');
     const notificationMessage = document.getElementById('copy-notification-message');
-
     notificationMessage.textContent = message;
     notification.style.display = 'block';
     notification.style.opacity = '1';
-
-    /* Hide the notification after 3 seconds */
     setTimeout(() => {
       notification.style.opacity = '0';
       setTimeout(() => {
         notification.style.display = 'none';
-      }, 300); /* Wait for the fade-out transition to complete */
-    }, 3000); /* Show notification for 3 seconds */
+      }, 300);
+    }, 3000);
   }
 </script>
+{% endunless %}
+
+{% if post.link %}{% assign pub_url = post.link %}{% else %}{% capture pub_url %}{{ base_path }}{{ post.url }}{% endcapture %}{% endif %}
+<div class="pub-item">
+  {% if post.image %}
+  <a class="pub-thumb" href="{{ pub_url }}" tabindex="-1" aria-hidden="true">
+    <img src="{{ base_path }}/{{ post.image }}" alt="" loading="lazy">
+  </a>
+  {% endif %}
+  <div class="pub-body">
+    <h3 class="pub-title" itemprop="headline">
+      <a href="{{ pub_url }}" rel="permalink">{{ post.title }}</a>
+    </h3>
+    {% if post.authors %}
+    <p class="pub-authors">{{ post.authors | replace: 'Danial Kamali', '<b>Danial Kamali</b>' }}</p>
+    {% endif %}
+    <p class="pub-venue">
+      <i>{{ post.venue }}</i>, {{ post.date | default: "1900-01-01" | date: "%Y" }}
+      {% if post.award %}<br><span class="pub-badge pub-badge--award"><i class="fa fa-trophy" aria-hidden="true"></i> {{ post.award }}</span>{% endif %}
+      {% if post.highlight %}{% unless post.award %}<br>{% endunless %}<span class="pub-badge"><i class="fa fa-microphone" aria-hidden="true"></i> {{ post.highlight }}</span>{% endif %}
+    </p>
+    <div class="pub-links">
+      {% if post.paperurl %}<a href="{{ post.paperurl }}" target="_blank" rel="noopener"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF</a>{% endif %}
+      {% if post.arxivurl %}<a href="{{ post.arxivurl }}" target="_blank" rel="noopener"><i class="ai ai-arxiv" aria-hidden="true"></i> arXiv</a>{% endif %}
+      {% if post.openreviewurl %}<a href="{{ post.openreviewurl }}" target="_blank" rel="noopener"><i class="fa fa-comments-o" aria-hidden="true"></i> OpenReview</a>{% endif %}
+      {% if post.slidesurl %}<a href="{{ base_path }}/{{ post.slidesurl }}" target="_blank" rel="noopener"><i class="fa fa-slideshare" aria-hidden="true"></i> Slides</a>{% endif %}
+      {% if post.posterurl %}<a href="{{ base_path }}/{{ post.posterurl }}" target="_blank" rel="noopener"><i class="fa fa-image" aria-hidden="true"></i> Poster</a>{% endif %}
+      {% if post.codeurl %}<a href="{{ post.codeurl }}" target="_blank" rel="noopener"><i class="fa fa-code" aria-hidden="true"></i> Code</a>{% endif %}
+      {% if post.dataseturl %}<a href="{{ post.dataseturl }}" target="_blank" rel="noopener"><i class="fa fa-database" aria-hidden="true"></i> Dataset</a>{% endif %}
+      {% if post.projecturl %}<a href="{{ base_path }}/{{ post.projecturl }}"><i class="fa fa-globe" aria-hidden="true"></i> Project</a>{% endif %}
+      {% if post.bibtex %}<a href="javascript:void(0);" onclick="copyCitation('{{ post.id }}')"><i class="fa fa-clipboard" aria-hidden="true"></i> BibTeX</a>{% endif %}
+    </div>
+    {% if post.bibtex %}<p id="bibtex-{{ post.id }}" style="display:none;">{{ post.bibtex }}</p>{% endif %}
+  </div>
+</div>
