@@ -464,22 +464,41 @@
       setStyle(e.gp, 'strokeDashoffset', String((-e.len * (1 - t)).toFixed(1)));
     }
     function dotsReset() { T.dotI = 0; }
-    function dot(x, y, color, r) {
+    function dot(x, y, color, r, op) {
       var d = T.dots[T.dotI];
       if (!d) { d = s('circle', { 'class': 'nd-dot', r: 4 }, T.gDots); T.dots.push(d); }
       T.dotI++;
-      setAttr(d, 'cx', x.toFixed(1)); setAttr(d, 'cy', y.toFixed(1)); setAttr(d, 'fill', color); setAttr(d, 'r', String(r || 4)); setStyle(d, 'opacity', '1');
+      setAttr(d, 'cx', x.toFixed(1)); setAttr(d, 'cy', y.toFixed(1)); setAttr(d, 'fill', color); setAttr(d, 'r', (r || 4).toFixed(2));
+      setStyle(d, 'opacity', String(op === undefined ? 1 : op));
     }
     function dotsDone() { for (var i = T.dotI; i < T.dots.length; i++) setStyle(T.dots[i], 'opacity', '0'); }
-    function stream(key, u, color, rev, k, r) {
-      var e = T.edges[key]; if (!e || u <= 0 || u >= 1) return;
-      k = k || 3;
-      for (var j = 0; j < k; j++) {
-        var f = u * 1.5 - j * 0.25;
-        if (f <= 0 || f >= 1) continue;
-        var pt = e.path.getPointAtLength((rev ? 1 - f : f) * e.len);
-        dot(pt.x, pt.y, color, r);
-      }
+    /* A value travelling from point a to point b. t in (0, 1) places the head (eased) with a short tail;
+       outside (0, 1) nothing is drawn: the value has not left yet, or it has arrived and the caller
+       draws what it produced from t >= 1 on. */
+    function comet(a, b, t, color, r) {
+      if (t <= 0 || t >= 1) return;
+      r = r || 4.2;
+      var horiz = Math.abs(b.x - a.x) > 2 * Math.abs(b.y - a.y);
+      var c1 = horiz ? { x: (a.x + b.x) / 2, y: a.y } : { x: a.x, y: (a.y + b.y) / 2 };
+      var c2 = horiz ? { x: (a.x + b.x) / 2, y: b.y } : { x: b.x, y: (a.y + b.y) / 2 };
+      var e = ease(t);
+      [0.12, 0.06, 0].forEach(function (lag, j) {
+        var q = e - lag; if (q <= 0) return;
+        var u = 1 - q, A = u * u * u, B = 3 * u * u * q, Cc = 3 * u * q * q, Dd = q * q * q;
+        dot(A * a.x + B * c1.x + Cc * c2.x + Dd * b.x, A * a.y + B * c1.y + Cc * c2.y + Dd * b.y, color,
+            j === 2 ? r : r * (0.5 + 0.2 * j), j === 2 ? 1 : 0.3 + 0.25 * j);
+      });
+    }
+    /* points in tree coordinates */
+    function barTop(id, k, v) { var n = T.nodes[id], b = n.bars[k]; return { x: n.box.l + b.x + b.w / 2, y: n.box.t + n.yb - clamp01(v) * n.mh }; }
+    function barBase(id, k) { return barTop(id, k, 0); }
+    function nodeSide(id, side) { var b = T.nodes[id].box; return side === 't' ? { x: b.x, y: b.t } : side === 'b' ? { x: b.x, y: b.b } : side === 'l' ? { x: b.l, y: b.y } : { x: b.r, y: b.y }; }
+    function fromVlm(p) { return { x: p.x, y: T.nodes.vlm.box.t }; }
+    /* staggered schedule for n values flowing over [a, b]: launch l, arrival a (bar starts to grow), filled f */
+    function wave(n, a, b) {
+      var L = b - a, F = L * (n > 1 ? 0.45 : 0.7), FL = L * 0.12, st = n > 1 ? (L - F - FL) / (n - 1) : 0, out = [];
+      for (var k = 0; k < n; k++) { var l = a + k * st; out.push({ l: l, a: l + F, f: l + F + FL }); }
+      return out;
     }
     function along(keys, f) {
       var tot = 0; keys.forEach(function (k) { tot += T.edges[k].len; });
@@ -535,10 +554,19 @@
       });
     }
     function hideChips() { chips.forEach(function (c) { setStyle(c.el, 'opacity', '0'); }); }
+    /* typing: starts right away and ends at TY1 of the opening step; each line's role colour
+       fades in as soon as that line is complete, so nothing is shown before it is typed */
+    var TY0 = 0.1, TY1 = 0.72, TFADE = 0.1, lineEnd = [], lacc = 0;
+    lineEls.forEach(function (l) { lacc += l.n; lineEnd.push(lacc / totalChars); });
     function buildPhase(P1, P2) {   // shared: typing (P1) and code -> tree (P2)
-      if (P1 < 1) showTyped(Math.round(totalChars * clamp01(P1 * 1.04)), P1 > 0 && P1 < 1);
-      else showTyped(totalChars, false);
-      lineEls.forEach(function (l) { setCls(l.el, 'nd-tint', P1 >= 0.92); });
+      var u = seg(P1, TY0, TY1);
+      showTyped(Math.round(totalChars * u), u > 0 && u < 1);
+      setStyle(pre, 'backgroundColor', 'rgba(248, 249, 250, ' + seg(P1, 0, TY0).toFixed(3) + ')');
+      lineEls.forEach(function (l, i) {
+        var tEnd = TY0 + (TY1 - TY0) * lineEnd[i];
+        var a = seg(P1, tEnd, tEnd + TFADE).toFixed(3);
+        if (memo(l.el, '--a', a)) l.el.style.setProperty('--a', a);
+      });
       if (P2 > 0 && P2 < 1) flyChips(P2); else hideChips();
       Object.keys(NODES).forEach(function (id) {
         if (id === 'vlm' || id === 'loss') return;
@@ -556,6 +584,8 @@
     }
 
     /* ================================================================ steps */
+    var GREEN = '#40c057', BLUE = '#4dabf7', PURPLE = '#9775fa', ORANGE = '#e8590c';
+    var FLY = 0.55, GROW = 0.25;     // one scoring slot: the score travels from the VLM, then its bar grows
     var steps, applyMode;
     if (mode === 'fwd') {
       /* ---------------------------------------------- forward (Figure 2, CLEVR) */
@@ -575,15 +605,15 @@
         }
       };
       var listVals = function (arr, idx) { return idx.map(function (i) { return 'box ' + i + ' (' + f2(arr[i]) + ')'; }).join(', '); };
+      var WAND = wave(N, 0.02, 0.98);
       steps = [
-        { t: 'Question', dur: 3800, cap: 'NePTune gets an image and a question. This is the example of Figure&nbsp;2 in the paper: <i>How many colors of small spheres are there?</i>' },
-        { t: 'Program', dur: 7000, cap: 'An LLM translates the question into a Python program. <span class="nd-c-con">Green</span> lines ask the VLM for concept scores, the <span class="nd-c-sl">blue</span> line composes them with soft logic, and the <span class="nd-c-imp">purple</span> lines are ordinary Python control flow.' },
-        { t: 'Code to tree', dur: 7600, cap: 'Each line becomes a node of a tree. The <span class="nd-c-con">green</span> and <span class="nd-c-sl">blue</span> nodes form a declarative first-order-logic formula that reasons over all boxes at once. The <span class="nd-c-imp">purple</span> nodes are the imperative Python around it.' },
-        { t: 'Detect', dur: 4200, cap: 'Grounding DINO proposes ' + N + ' boxes. From here on, every declarative node holds a vector with one soft truth value per box (the bars, box&nbsp;0 to ' + (N - 1) + ').' },
-        { t: 'Concept scores', dur: 9000, cap: '<code>score()</code> draws a red box around one object at a time and asks the VLM a yes/no question. The score is p(Yes), computed from the logits of the &ldquo;Yes&rdquo; and &ldquo;No&rdquo; tokens. <span class="nd-c-con">sphere</span> and <span class="nd-c-con">small</span> each fill a vector.' },
-        { t: 'Soft AND', dur: 6500, cap: '<code>&amp;</code> is the soft AND: the element-wise minimum of the two vectors (Table&nbsp;2). <span class="nd-c-sl">small_sphere</span> is high exactly where both scores are high: ' + listVals(AND, passIdx) + '. ' + (R.and_note || '') },
+        { t: 'Program', dur: 3400, cap: 'NePTune gets an image and a question (Figure&nbsp;2 in the paper), and an LLM translates the question into a Python program. <span class="nd-c-con">Green</span> lines ask the VLM for concept scores, the <span class="nd-c-sl">blue</span> line composes them with soft logic, and the <span class="nd-c-imp">purple</span> lines are Python control flow.' },
+        { t: 'Code to tree', dur: 7000, cap: 'Each line becomes a node of a tree. The <span class="nd-c-con">green</span> and <span class="nd-c-sl">blue</span> nodes form a declarative first-order-logic formula that reasons over all boxes at once. The <span class="nd-c-imp">purple</span> nodes are the imperative Python around it.' },
+        { t: 'Detect', dur: 3600, cap: 'Grounding DINO proposes ' + N + ' boxes. From here on, every declarative node holds a vector with one soft truth value per box (the bars, box&nbsp;0 to ' + (N - 1) + ').' },
+        { t: 'Concept scores', dur: 9000, cap: '<code>score()</code> draws a red box around one object at a time and asks the VLM a yes/no question. The score is p(Yes), computed from the logits of the &ldquo;Yes&rdquo; and &ldquo;No&rdquo; tokens. Each score flows into its bar in <span class="nd-c-con">sphere</span> or <span class="nd-c-con">small</span>.' },
+        { t: 'Soft AND', dur: 7200, cap: '<code>&amp;</code> composes the two vectors with the soft AND, the element-wise minimum (Table&nbsp;2). The two scores of each box flow into its <span class="nd-c-sl">small_sphere</span> bar, which is high exactly where both are high: ' + listVals(AND, passIdx) + '. ' + (R.and_note || '') },
         { t: 'Loop and branch', dur: 3000 + 1000 * iterTot, cap: 'Python takes over. <span class="nd-c-imp">for</span> visits every box, <span class="nd-c-imp">if</span> turns its soft score into True or False (a score of at least 0.5 is True), and for each True box <span class="nd-c-imp">query()</span> asks the VLM for the color. The answers go into a set.' },
-        { t: 'Answer', dur: 5600, cap: 'The VLM answered ' + (function () {
+        { t: 'Answer', dur: 4800, cap: 'The VLM answered ' + (function () {
             var cnt = {}, words = ['', 'one', 'two', 'three', 'four', 'five'];
             passIdx.forEach(function (i) { cnt[answers[i]] = (cnt[answers[i]] || 0) + 1; });
             var parts = colorsOrdered.map(function (c) { return '&ldquo;' + esc(c) + '&rdquo; for ' + (words[cnt[c]] || cnt[c]) + (cnt[c] > 1 ? ' small spheres' : ' small sphere'); });
@@ -594,39 +624,53 @@
         p = clamp01(p / steps[i].e);
         var P = steps.map(function (_, k) { return k < i ? 1 : k === i ? p : 0; });
         dotsReset();
-        buildPhase(P[1], P[2]);
-        nodeOp('vlm', seg(P[4], 0, 0.06));
-        ['vlm>sphere', 'vlm>small', 'vlm>query'].forEach(function (k) { edgeDraw(k, seg(P[4], 0.02, 0.1)); });
-        setOp(T.impT, seg(P[2], nodeLand('len'), nodeLand('len') + 0.08));
-        setOp(imgP, seg(P[0], 0, 0.25));
-        boxEls.forEach(function (b, k) { var a = 0.06 + (0.6 * k) / N; setOp(b.g, seg(P[3], a, a + 0.12)); });
+        setOp(imgP, 1);
+        buildPhase(P[0], P[1]);
+        setOp(T.impT, seg(P[1], nodeLand('len'), nodeLand('len') + 0.08));
+        boxEls.forEach(function (b, k) { var a = 0.06 + (0.6 * k) / N; setOp(b.g, seg(P[2], a, a + 0.12)); });
+        nodeOp('vlm', seg(P[3], 0, 0.05));
+        ['vlm>sphere', 'vlm>small', 'vlm>query'].forEach(function (k) { edgeDraw(k, seg(P[3], 0.01, 0.06)); });
         var hot = [], lines = [], red = -1, cap = '';
-        var uS = seg(P[4], 0.06, 0.5) * N, uM = seg(P[4], 0.54, 0.98) * N, fillS = [], fillM = [], fillA = [];
-        for (var k = 0; k < N; k++) { fillS.push(clamp01((uS - k - 0.45) / 0.5)); fillM.push(clamp01((uM - k - 0.45) / 0.5)); }
+        ['sphere', 'small', 'and'].forEach(function (id) { cur(id, null); badge(id, '', '', 0); });
+
+        /* concept scores: one box at a time; the score travels up from the VLM and the bar grows on arrival */
+        var uS = seg(P[3], 0.06, 0.52) * N, uM = seg(P[3], 0.54, 1) * N, fillS = [], fillM = [], fillA = [];
+        for (var k = 0; k < N; k++) { fillS.push(ease(seg(uS - k, FLY, FLY + GROW))); fillM.push(ease(seg(uM - k, FLY, FLY + GROW))); }
         setBars('sphere', SPH, fillS); setBars('small', SML, fillM);
-        cur('sphere', null); cur('small', null); cur('and', null);
-        badge('sphere', '', '', 0); badge('small', '', '', 0); badge('and', '', '', 0);
-        if (i === 4) {
-          if (uS > 0 && uS < N) { var j = Math.min(N - 1, Math.floor(uS)); red = j; cur('sphere', j); lines = [1]; hot = ['sphere'];
-            badge('sphere', 'box ' + j + ': ' + f2(SPH[j]), 'con', 1); stream('vlm>sphere', clamp01((uS % 1) / 0.5), '#40c057', false, 2); cap = 'Is the object in the red bounding box a sphere?'; }
-          if (uM > 0 && uM < N) { var j2 = Math.min(N - 1, Math.floor(uM)); red = j2; cur('small', j2); lines = [2]; hot = ['small'];
-            badge('small', 'box ' + j2 + ': ' + f2(SML[j2]), 'con', 1); stream('vlm>small', clamp01((uM % 1) / 0.5), '#40c057', false, 2); cap = 'Is the object in the red bounding box small?'; }
+        if (i === 3) {
+          var lane = function (id, u, vals, line, question) {
+            if (u <= 0 || u >= N) return;
+            var j = Math.min(N - 1, Math.floor(u)), q = u - j;
+            red = j; cur(id, j); lines = [line]; hot = [id]; cap = question;
+            comet(fromVlm(barBase(id, j)), barBase(id, j), seg(q, 0, FLY), GREEN);
+            if (q >= FLY) badge(id, 'box ' + j + ': ' + f2(vals[j]), 'con', 1);
+          };
+          lane('sphere', uS, SPH, 1, 'Is the object in the red bounding box a sphere?');
+          lane('small', uM, SML, 2, 'Is the object in the red bounding box small?');
         }
-        var uA = seg(P[5], 0.32, 0.98) * N;
-        for (var k2 = 0; k2 < N; k2++) fillA.push(clamp01(uA - k2));
+
+        /* soft AND: the two scores of every box flow into its AND bar, which grows on arrival (a wave over the boxes) */
+        for (var k2 = 0; k2 < N; k2++) fillA.push(ease(seg(P[4], WAND[k2].a, WAND[k2].f)));
         setBars('and', AND, fillA);
-        if (i === 5) {
+        if (i === 4) {
           lines = [3]; hot = ['and'];
-          stream('sphere>and', seg(p, 0.0, 0.32), '#40c057', false, 3);
-          stream('small>and', seg(p, 0.0, 0.32), '#40c057', false, 3);
-          if (uA > 0 && uA < N) { var j3 = Math.min(N - 1, Math.floor(uA)); cur('and', j3); cur('sphere', j3); cur('small', j3);
-            badge('and', 'min(' + f2(SPH[j3]) + ', ' + f2(SML[j3]) + ') = ' + f2(AND[j3]), 'sl', 1); }
+          var lastK = -1;
+          for (var k3 = 0; k3 < N; k3++) {
+            var tt = seg(P[4], WAND[k3].l, WAND[k3].a);
+            comet(barTop('sphere', k3, SPH[k3]), barBase('and', k3), tt, GREEN, 3.6);
+            comet(barTop('small', k3, SML[k3]), barBase('and', k3), tt, GREEN, 3.6);
+            if (P[4] >= WAND[k3].a) lastK = k3;
+          }
+          if (lastK >= 0) { cur('and', lastK); cur('sphere', lastK); cur('small', lastK);
+            badge('and', 'min(' + f2(SPH[lastK]) + ', ' + f2(SML[lastK]) + ') = ' + f2(AND[lastK]), 'sl', 1); }
         }
+
+        /* loop and branch */
         var setList = [], passShown = [], ansShown = {}, forTxt = '', ifTxt = '', qTxt = '';
         setOp(T.chip, 0);
         var finalLoop = function () { setList = colorsOrdered.slice(); pass.forEach(function (ok, k) { passShown[k] = ok; if (ok) ansShown[k] = true; }); };
-        if (i > 6) finalLoop();
-        if (i === 6) {
+        if (i > 5) finalLoop();
+        if (i === 5) {
           var u = seg(p, 0.02, 1.0);
           var it = iterAt(u), kk = it.k, qq = it.q;
           for (var m = 0; m < kk; m++) { passShown[m] = pass[m]; if (pass[m]) { ansShown[m] = true; if (setList.indexOf(answers[m]) < 0) setList.push(answers[m]); } }
@@ -634,15 +678,16 @@
             red = kk; cur('and', kk);
             forTxt = 'i = ' + kk; lines = [5]; hot = ['for'];
             if (qq > 0.16) {
-              stream('and>if', seg(qq, 0.16, 0.38), '#4dabf7', false, 2);
+              /* the box's soft value travels to the if node; the verdict appears on arrival */
+              comet(barTop('and', kk, AND[kk]), nodeSide('if', 'b'), seg(qq, 0.16, 0.38), BLUE);
               lines = [6]; hot = ['if'];
-              if (qq > 0.38) ifTxt = 'small_sphere[' + kk + '] = ' + f2(AND[kk]) + (pass[kk] ? '  ≥ 0.5 → True' : '  < 0.5 → False');
+              if (qq >= 0.38) ifTxt = 'small_sphere[' + kk + '] = ' + f2(AND[kk]) + (pass[kk] ? '  ≥ 0.5 → True' : '  < 0.5 → False');
             }
-            if (qq > 0.38) passShown[kk] = pass[kk];
+            if (qq >= 0.38) passShown[kk] = pass[kk];
             if (pass[kk] && qq > 0.45) {
-              lines = qq < 0.72 ? [7] : [8]; hot = qq < 0.72 ? ['query'] : ['set'];
-              stream('vlm>query', seg(qq, 0.45, 0.62), '#40c057', false, 2);
-              if (qq > 0.62) { qTxt = '“' + answers[kk] + '”'; ansShown[kk] = true; }
+              lines = qq < 0.7 ? [7] : [8]; hot = qq < 0.7 ? ['query'] : ['set'];
+              comet(fromVlm(nodeSide('query', 'b')), nodeSide('query', 'b'), seg(qq, 0.45, 0.62), GREEN);
+              if (qq >= 0.62) { qTxt = '“' + answers[kk] + '”'; ansShown[kk] = true; }
               if (qq > 0.7 && qq < 0.97) {
                 var pt = along(['query>if', 'if>for', 'for>set'], ease(seg(qq, 0.7, 0.97)));
                 setText(T.chipT, '"' + answers[kk] + '"');
@@ -659,19 +704,21 @@
         badge('query', qTxt, 'imp', qTxt ? 1 : 0);
         setText(T.nodes['if'].sub, ifTxt || 'True when the soft score is at least 0.5');
         setText(T.nodes.set.sub, setStr(setList));
-        if (i === 7) { lines = [9]; hot = ['len']; stream('set>len', seg(p, 0.05, 0.5), '#9775fa', false, 3); }
+
+        /* answer: the set flows into len(), the result appears on arrival */
+        if (i === 6) { lines = [9]; hot = ['len']; comet(nodeSide('set', 't'), nodeSide('len', 'b'), seg(p, 0.05, 0.45), PURPLE, 5); }
         setText(T.ansT, '= ' + R.answer);
         T.ans.querySelector('rect').style.fill = '#7048e8';
-        setOp(T.ans, i === 7 ? seg(p, 0.5, 0.62) : 0);
+        setOp(T.ans, i === 6 ? seg(p, 0.45, 0.55) : 0);
         badge('len', '', '', 0);
         boxEls.forEach(function (b, k) {
           var isRed = k === red, isPass = !isRed && passShown[k] === true, isFail = !isRed && passShown[k] === false;
           setCls(b.r, 'nd-red', isRed); setCls(b.tb, 'nd-red', isRed);
           setCls(b.r, 'nd-pass', isPass); setCls(b.tb, 'nd-pass', isPass);
-          if (P[3] >= 1) setOp(b.g, isFail && i >= 6 ? 0.35 : 1);
+          if (P[2] >= 1) setOp(b.g, isFail && i >= 5 ? 0.35 : 1);
         });
         Object.keys(ansEls).forEach(function (k) { setOp(ansEls[k], ansShown[k] ? 1 : 0); });
-        setText(imgCap, cap || (i === 3 ? N + ' boxes from Grounding DINO' : ''));
+        setText(imgCap, cap || (i === 2 ? N + ' boxes from Grounding DINO' : ''));
         lineHot(lines); nodeHot(hot);
         dotsDone();
       };
@@ -681,58 +728,88 @@
       var argmax = function (a) { var b = 0; for (var i = 0; i < a.length; i++) if (a[i] > a[b]) b = i; return b; };
       var pred0 = argmax(S0.out), predK = argmax(SK.out);
       var vec = function (a) { return '[' + a.map(f2).join(', ') + ']'; };
+      var WA2 = wave(N, 0.02, 0.46), IO_L = 0.5, IO_A = 0.74, IO_F = 0.86;     // forward pass schedule
+      var LS_L = 0.3, LS_A = 0.6;                                               // loss: values flow into the loss
+      var G1 = [0.02, 0.22], G2 = [0.26, 0.44], G3 = [0.48, 0.66], G4 = [0.7, 0.86];   // gradient, stage by stage
+      var ROUNDS = 5, PULSE = 0.6;                                              // tuning: gradient pulse, then the update
       steps = [
-        { t: 'Expression', dur: 4200, cap: 'NePTune also grounds referring expressions. This is Expression&nbsp;1 of Figure&nbsp;3 in the paper, <i>' + esc(R.question) + '</i>, on an image from Ref-GTA, a video game environment that is a new domain for VLMs trained on natural images.' },
-        { t: 'Program', dur: 5200, cap: 'The program is a single declarative formula: two concept scores, a soft AND, and <code>iota</code>, which picks the box that best matches the expression.' },
-        { t: 'Program tree', dur: 5600, cap: 'As a tree, the concept scores sit at the leaves, the soft AND above them and <code>iota</code> at the root. Every node is a differentiable operation, so the whole formula is <span class="nd-c-grad">differentiable end to end</span>.' },
-        { t: 'Concept scores', dur: 6400, cap: 'Grounding DINO proposes ' + N + ' boxes, and the VLM scores each one: <span class="nd-c-con">is_man</span> = ' + vec(S0.man) + ' and <span class="nd-c-con">is_wearing_black</span> = ' + vec(S0.black) + '.' },
-        { t: 'Forward pass', dur: 6400, cap: 'The soft AND takes the minimum per box, ' + vec(S0.and) + ', and <code>iota</code> turns it into a distribution over the boxes (a softmax, Table&nbsp;2): ' + vec(S0.out) + '. NePTune selects box&nbsp;' + pred0 + (pred0 === G ? ', the man in the suit.' : '.') },
-        { t: 'Loss', dur: 6000, cap: 'To fine-tune, the paper compares the program&rsquo;s output with the ground-truth box (box&nbsp;' + G + ') using binary cross-entropy. The loss is attached to the answer itself: L = ' + f2(S0.loss) + '.' },
+        { t: 'Program', dur: 3200, cap: 'NePTune also grounds referring expressions. Expression&nbsp;1 of Figure&nbsp;3 in the paper, <i>' + esc(R.question) + '</i>, comes from Ref-GTA, a video game domain that is new to VLMs trained on natural images. Its program is a single declarative formula: two concept scores, a soft AND and <code>iota</code>, which picks the best-matching box.' },
+        { t: 'Program tree', dur: 5000, cap: 'As a tree, the concept scores sit at the leaves, the soft AND above them and <code>iota</code> at the root. Every node is a differentiable operation, so the whole formula is <span class="nd-c-grad">differentiable end to end</span>.' },
+        { t: 'Concept scores', dur: 6000, cap: 'Grounding DINO proposes ' + N + ' boxes, and the VLM scores each one: <span class="nd-c-con">is_man</span> = ' + vec(S0.man) + ' and <span class="nd-c-con">is_wearing_black</span> = ' + vec(S0.black) + '.' },
+        { t: 'Forward pass', dur: 6800, cap: 'The scores flow up the formula. The soft AND takes the minimum per box, ' + vec(S0.and) + ', and <code>iota</code> turns these into a distribution over the boxes (a softmax, Table&nbsp;2): ' + vec(S0.out) + '. NePTune selects box&nbsp;' + pred0 + (pred0 === G ? ', the man in the suit.' : '.') },
+        { t: 'Loss', dur: 6000, cap: 'To fine-tune, the paper compares the program&rsquo;s output with the ground-truth box (box&nbsp;' + G + ') using binary cross-entropy. The answer flows into the loss: L = ' + f2(S0.loss) + '.' },
         { t: 'Gradient', dur: 7600, cap: 'The gradient of the loss flows back through <code>iota</code> and the soft AND into the concept scores, and from each score, through its Yes/No logits, into the VLM. At the AND it goes to the smaller of the two scores of each box. ' + (R.route_note || '') },
-        { t: 'Tuning', dur: 9500, cap: 'Each update tunes the VLM&rsquo;s concept scores through the program: the score of the target box rises, the other box falls, and the loss drops from ' + f2(S0.loss) + ' to ' + f2(SK.loss) + ' over ' + K + ' steps. ' + (pred0 !== G && predK === G ? 'The selection moves to the right box.' : 'The selection becomes more confident.') },
+        { t: 'Tuning', dur: 10000, cap: 'Each update sends the gradient through the program and then tunes the VLM&rsquo;s concept scores: the score of the target box rises, the other box falls, and the loss drops from ' + f2(S0.loss) + ' to ' + f2(SK.loss) + ' over ' + K + ' steps. ' + (pred0 !== G && predK === G ? 'The selection moves to the right box.' : 'The selection becomes more confident.') },
         { t: 'In the paper', dur: 7600, cap: 'This is how the paper adapts NePTune to Ref-GTA. Fine-tuning a 1B VLM through the program with only 1,000 samples raises NePTune (1B) from 34.92% to <b>69.90%</b>, while standard fine-tuning of the same VLM reaches 32.61% (Table&nbsp;7).' }
       ];
       var L0 = ST.map(function (st) { return st.loss; }), lmax = Math.max.apply(null, L0) * 1.05;
+      var recvLeaf = function (vM, vB, k) { return vM[k] <= vB[k] ? 'man' : 'black'; };   // min routes the gradient to the smaller input
+      /* one gradient pulse from the loss down to the VLM, stages at [0, .25, .5, .75, 1] of u */
+      var pulse = function (u, vM, vB, vA, vO, r) {
+        var st = [[0, 0.25], [0.25, 0.5], [0.5, 0.75], [0.75, 1]];
+        for (var k = 0; k < N; k++) {
+          var leaf = recvLeaf(vM, vB, k), lv = leaf === 'man' ? vM[k] : vB[k];
+          comet(nodeSide('loss', 'l'), barTop('iota', k, vO[k]), seg(u, st[0][0], st[0][1]), ORANGE, r);
+          comet(barBase('iota', k), barTop('and', k, vA[k]), seg(u, st[1][0], st[1][1]), ORANGE, r);
+          comet(barBase('and', k), barTop(leaf, k, lv), seg(u, st[2][0], st[2][1]), ORANGE, r);
+          comet(barBase(leaf, k), fromVlm(barBase(leaf, k)), seg(u, st[3][0], st[3][1]), ORANGE, r);
+        }
+      };
       applyMode = function (i, p) {
         p = clamp01(p / steps[i].e);
         var P = steps.map(function (_, k) { return k < i ? 1 : k === i ? p : 0; });
         dotsReset();
-        buildPhase(P[1], P[2]);
-        nodeOp('vlm', seg(P[3], 0, 0.08));
-        edgeDraw('vlm>man', seg(P[3], 0.02, 0.1)); edgeDraw('vlm>black', seg(P[3], 0.02, 0.1));
-        nodeOp('loss', seg(P[5], 0, 0.2));
-        edgeDraw('iota>loss', seg(P[5], 0.1, 0.3));
-        setOp(imgP, seg(P[0], 0, 0.25));
-        /* values: tuning interpolation */
-        var sIdx = seg(P[7], 0.04, 1) * K, s0 = Math.floor(sIdx), s1 = Math.min(K, s0 + 1), w = ease(sIdx - s0);
-        var A = ST[s0], B = ST[s1];
+        setOp(imgP, 1);
+        buildPhase(P[0], P[1]);
+        nodeOp('vlm', seg(P[2], 0, 0.06));
+        edgeDraw('vlm>man', seg(P[2], 0.01, 0.08)); edgeDraw('vlm>black', seg(P[2], 0.01, 0.08));
+        nodeOp('loss', seg(P[4], 0.1, 0.22));
+        edgeDraw('iota>loss', seg(P[4], 0.15, 0.28));
+
+        /* values: tuning runs in ROUNDS; in each round the gradient pulse travels first, then the scores move */
+        var uT = seg(P[6], 0.02, 1) * ROUNDS, rc = Math.min(ROUNDS - 1, Math.floor(uT)), qT = P[6] >= 1 ? 1 : uT - rc;
+        var i0 = Math.round(rc * K / ROUNDS), i1 = Math.round((rc + 1) * K / ROUNDS), w = ease(seg(qT, PULSE + 0.02, 0.98));
+        var A = ST[i0], B = ST[i1];
         var mix = function (key) { return A[key].map(function (v, k) { return lerp(v, B[key][k], w); }); };
         var vM = mix('man'), vB = mix('black'), vA = mix('and'), vO = mix('out'), lossNow = lerp(A.loss, B.loss, w);
+        var sIdx = i0 + (i1 - i0) * w;
         var lines = [], hot = [], red = -1, cap = '';
-        /* concept scores */
-        var uM = seg(P[3], 0.14, 0.56) * N, uB = seg(P[3], 0.58, 1.0) * N, fM = [], fB = [], fA = [], fO = [];
-        for (var k = 0; k < N; k++) { fM.push(clamp01((uM - k - 0.45) / 0.5)); fB.push(clamp01((uB - k - 0.45) / 0.5)); }
-        setBars('man', vM, fM); setBars('black', vB, fB);
         ['man', 'black', 'and', 'iota'].forEach(function (id) { cur(id, null); badge(id, '', '', 0); });
-        boxEls.forEach(function (b, k) { setOp(b.g, seg(P[3], 0.02 + 0.05 * k, 0.1 + 0.05 * k)); });
-        if (i === 3) {
-          if (uM > 0 && uM < N) { var j = Math.min(N - 1, Math.floor(uM)); red = j; cur('man', j); lines = [0]; hot = ['man'];
-            badge('man', 'box ' + j + ': ' + f2(vM[j]), 'con', 1); stream('vlm>man', clamp01((uM % 1) / 0.5), '#40c057', false, 2); cap = 'Is the main object inside of the red bounding box a man?'; }
-          if (uB > 0 && uB < N) { var j2 = Math.min(N - 1, Math.floor(uB)); red = j2; cur('black', j2); lines = [1]; hot = ['black'];
-            badge('black', 'box ' + j2 + ': ' + f2(vB[j2]), 'con', 1); stream('vlm>black', clamp01((uB % 1) / 0.5), '#40c057', false, 2); cap = 'Is the man inside of the red bounding box wearing black?'; }
+
+        /* concept scores: one box at a time, the bar grows when the score arrives */
+        var uM = seg(P[2], 0.12, 0.56) * N, uB = seg(P[2], 0.58, 1) * N, fM = [], fB = [], fA = [], fO = [];
+        for (var k = 0; k < N; k++) { fM.push(ease(seg(uM - k, FLY, FLY + GROW))); fB.push(ease(seg(uB - k, FLY, FLY + GROW))); }
+        setBars('man', vM, fM); setBars('black', vB, fB);
+        boxEls.forEach(function (b, k) { setOp(b.g, seg(P[2], 0.02 + 0.04 * k, 0.08 + 0.04 * k)); });
+        if (i === 2) {
+          var lane = function (id, u, vals, line, question) {
+            if (u <= 0 || u >= N) return;
+            var j = Math.min(N - 1, Math.floor(u)), q = u - j;
+            red = j; cur(id, j); lines = [line]; hot = [id]; cap = question;
+            comet(fromVlm(barBase(id, j)), barBase(id, j), seg(q, 0, FLY), GREEN);
+            if (q >= FLY) badge(id, 'box ' + j + ': ' + f2(vals[j]), 'con', 1);
+          };
+          lane('man', uM, vM, 0, 'Is the main object inside of the red bounding box a man?');
+          lane('black', uB, vB, 1, 'Is the man inside of the red bounding box wearing black?');
           if (!cap) cap = N + ' boxes from Grounding DINO';
         }
-        /* forward: AND then iota */
-        var uA = seg(P[4], 0.22, 0.42) * N, uO = seg(P[4], 0.66, 0.86) * N;
-        for (var k2 = 0; k2 < N; k2++) { fA.push(clamp01(uA - k2)); fO.push(clamp01(uO - k2)); }
+
+        /* forward pass: scores flow into the AND bars (each grows on arrival), then all AND values flow into iota together */
+        for (var k2 = 0; k2 < N; k2++) { fA.push(ease(seg(P[3], WA2[k2].a, WA2[k2].f))); fO.push(ease(seg(P[3], IO_A, IO_F))); }
         setBars('and', vA, fA); setBars('iota', vO, fO);
-        if (i === 4) {
-          lines = p < 0.5 ? [2] : [3]; hot = p < 0.5 ? ['and'] : ['iota'];
-          stream('man>and', seg(p, 0.0, 0.22), '#40c057', false, 3); stream('black>and', seg(p, 0.0, 0.22), '#40c057', false, 3);
-          stream('and>iota', seg(p, 0.46, 0.66), '#4dabf7', false, 3);
+        if (i === 3) {
+          var lastK = -1;
+          for (var k3 = 0; k3 < N; k3++) {
+            var tt = seg(P[3], WA2[k3].l, WA2[k3].a);
+            comet(barTop('man', k3, vM[k3]), barBase('and', k3), tt, GREEN);
+            comet(barTop('black', k3, vB[k3]), barBase('and', k3), tt, GREEN);
+            comet(barTop('and', k3, vA[k3]), barBase('iota', k3), seg(P[3], IO_L, IO_A), BLUE);
+            if (P[3] >= WA2[k3].a) lastK = k3;
+          }
+          if (lastK >= 0 && P[3] < IO_L) { cur('and', lastK); badge('and', 'min(' + f2(vM[lastK]) + ', ' + f2(vB[lastK]) + ') = ' + f2(vA[lastK]), 'sl', 1); }
+          lines = P[3] < IO_L - 0.02 ? [2] : [3]; hot = P[3] < IO_L - 0.02 ? ['and'] : ['iota'];
         }
-        var showSel = P[4] > 0.9;
-        var sel = argmax(vO);
+        var sel = argmax(vO), selOp = seg(P[3], IO_F, IO_F + 0.05);
         if (selEl) {
           var sb = R.boxes[sel];
           setAttr(selEl.rect, 'x', sb[0]); setAttr(selEl.rect, 'y', sb[1]); setAttr(selEl.rect, 'width', sb[2] - sb[0]); setAttr(selEl.rect, 'height', sb[3] - sb[1]);
@@ -741,48 +818,54 @@
           setAttr(selEl.t, 'x', lx + 10); setAttr(selEl.t, 'y', ly + 23);
           setText(selEl.t, 'NePTune: box ' + sel + ' (' + f2(vO[sel]) + ')');
           setAttr(selEl, 'class', sel === G ? 'nd-selg ok' : 'nd-selg');
-          setOp(selEl, showSel ? 1 : 0);
-          setOp(gtEl, seg(P[5], 0.3, 0.55));
+          setOp(selEl, selOp);
+          setOp(gtEl, seg(P[4], 0.02, 0.15));
         }
-        /* loss + target */
-        setText(T.nodes.loss.sub, 'L = ' + f2(lossNow));
-        var tOp = seg(P[5], 0.35, 0.6);
+
+        /* loss: target first, then the answer flows into the loss node and L appears on arrival */
+        var tOp = seg(P[4], 0.06, 0.18);
         T.nodes.iota.bars.forEach(function (b, k) {
           var hh = Math.max(2, (k === G ? 1 : 0) * T.nodes.iota.mh);
           setAttr(b.tgt, 'y', (T.nodes.iota.yb - hh).toFixed(1)); setAttr(b.tgt, 'height', hh.toFixed(1)); setOp(b.tgt, tOp);
         });
-        if (i === 5) { lines = [3]; hot = ['loss']; }
-        /* gradient */
-        var gOn = seg(P[6], 0.0, 0.2);
-        var glow = P[6] > 0.05;
-        var reach = { iota: 0.2, and: 0.4, man: 0.6, black: 0.6 };   // when the gradient pulse arrives at each node
-        ['iota', 'and', 'man', 'black'].forEach(function (id) { setCls(T.nodes[id].g, 'nd-glow', P[6] >= reach[id]); });
-        setCls(T.nodes.vlm.g, 'nd-glow', P[6] >= 0.8);
+        var lossShown = P[4] >= LS_A;
+        setText(T.nodes.loss.sub, lossShown ? 'L = ' + f2(lossNow) : 'vs. ground truth');
+        if (i === 4) {
+          lines = [3]; hot = ['loss'];
+          for (var k4 = 0; k4 < N; k4++) comet(barTop('iota', k4, vO[k4]), nodeSide('loss', 'l'), seg(P[4], LS_L, LS_A), BLUE);
+        }
+        badge('iota', lossShown ? 'L = ' + f2(lossNow) : '', 'grad', lossShown ? seg(P[4], LS_A, LS_A + 0.05) : 0);
+
+        /* gradient: loss -> iota -> AND -> the smaller input -> VLM; each node lights up when the pulse arrives */
+        var reach = { iota: G1[1], and: G2[1], man: G3[1], black: G3[1] };
+        var anyRecv = { man: false, black: false };
+        for (var k5 = 0; k5 < N; k5++) anyRecv[recvLeaf(vM, vB, k5)] = true;
+        ['iota', 'and', 'man', 'black'].forEach(function (id) { setCls(T.nodes[id].g, 'nd-glow', P[5] >= reach[id] && (id === 'iota' || id === 'and' || anyRecv[id])); });
+        setCls(T.nodes.vlm.g, 'nd-glow', P[5] >= G4[1]);
+        var glow = P[5] > 0;
         setCls(T.region, 'rg-grad', glow); setCls(T.regionT, 'rg-grad', glow);
-        gEdge('iota>loss', seg(P[6], 0, 0.2)); gEdge('and>iota', seg(P[6], 0.2, 0.4));
-        gEdge('man>and', seg(P[6], 0.4, 0.6)); gEdge('black>and', seg(P[6], 0.4, 0.6));
-        gEdge('vlm>man', seg(P[6], 0.62, 0.8)); gEdge('vlm>black', seg(P[6], 0.62, 0.8));
-        if (i === 6) {
-          stream('iota>loss', seg(p, 0, 0.22), '#e8590c', true, 3, 4.5);
-          stream('and>iota', seg(p, 0.2, 0.42), '#e8590c', true, 3, 4.5);
-          stream('man>and', seg(p, 0.4, 0.62), '#e8590c', true, 3, 4.5); stream('black>and', seg(p, 0.4, 0.62), '#e8590c', true, 3, 4.5);
-          stream('vlm>man', seg(p, 0.62, 0.84), '#e8590c', true, 3, 4.5); stream('vlm>black', seg(p, 0.62, 0.84), '#e8590c', true, 3, 4.5);
-          lines = p < 0.2 ? [3] : p < 0.4 ? [2] : [0, 1]; hot = [];
+        gEdge('iota>loss', seg(P[5], G1[0], G1[1])); gEdge('and>iota', seg(P[5], G2[0], G2[1]));
+        gEdge('man>and', anyRecv.man ? seg(P[5], G3[0], G3[1]) : 0); gEdge('black>and', anyRecv.black ? seg(P[5], G3[0], G3[1]) : 0);
+        gEdge('vlm>man', anyRecv.man ? seg(P[5], G4[0], G4[1]) : 0); gEdge('vlm>black', anyRecv.black ? seg(P[5], G4[0], G4[1]) : 0);
+        if (i === 5) {
+          for (var k6 = 0; k6 < N; k6++) {
+            var leaf = recvLeaf(vM, vB, k6), lv = leaf === 'man' ? vM[k6] : vB[k6];
+            comet(nodeSide('loss', 'l'), barTop('iota', k6, vO[k6]), seg(p, G1[0], G1[1]), ORANGE, 4.6);
+            comet(barBase('iota', k6), barTop('and', k6, vA[k6]), seg(p, G2[0], G2[1]), ORANGE, 4.6);
+            comet(barBase('and', k6), barTop(leaf, k6, lv), seg(p, G3[0], G3[1]), ORANGE, 4.6);
+            comet(barBase(leaf, k6), fromVlm(barBase(leaf, k6)), seg(p, G4[0], G4[1]), ORANGE, 4.6);
+          }
+          lines = p < G1[1] ? [3] : p < G2[1] ? [2] : [anyRecv.man ? 0 : 1, anyRecv.black ? 1 : 0];
         }
-        if (i === 7) {
-          var u7 = (p * 5) % 1;
-          stream('iota>loss', u7, '#e8590c', true, 2, 3.5); stream('and>iota', (u7 + 0.25) % 1, '#e8590c', true, 2, 3.5);
-          stream('man>and', (u7 + 0.5) % 1, '#e8590c', true, 2, 3.5); stream('black>and', (u7 + 0.5) % 1, '#e8590c', true, 2, 3.5);
-          stream('vlm>man', (u7 + 0.75) % 1, '#e8590c', true, 2, 3.5); stream('vlm>black', (u7 + 0.75) % 1, '#e8590c', true, 2, 3.5);
-        }
-        setText(T.nodes.vlm.lab, P[6] >= 0.8 ? (layoutName === 'narrow' ? 'VLM: gradient \u2192 logits \u2192 LoRA weights' : 'VLM: gradient \u2192 Yes/No logits \u2192 LoRA weights')
+        if (i === 6) pulse(seg(qT, 0, PULSE), vM, vB, vA, vO, 3.6);
+        setText(T.nodes.vlm.lab, P[5] >= G4[1] ? (layoutName === 'narrow' ? 'VLM: gradient → logits → LoRA weights' : 'VLM: gradient → Yes/No logits → LoRA weights')
           : 'Vision-language model (VLM)');
-        /* arrows: which way gradient descent moves each score (only where the min routes the gradient) */
+        /* arrows: which way gradient descent moves each score, shown where the gradient arrives */
         ['man', 'black', 'and', 'iota'].forEach(function (id) {
-          var n = T.nodes[id], aOp = seg(P[6], reach[id], reach[id] + 0.06);
+          var n = T.nodes[id], aOp = seg(P[5], reach[id], reach[id] + 0.05);
           n.bars.forEach(function (b, k) {
             var up = k === G;
-            var recv = id === 'and' || id === 'iota' || (id === 'man' ? vM[k] <= vB[k] : vB[k] < vM[k]);
+            var recv = id === 'and' || id === 'iota' || recvLeaf(vM, vB, k) === id;
             var v = id === 'man' ? vM[k] : id === 'black' ? vB[k] : id === 'and' ? vA[k] : vO[k];
             var room = up ? 1 - v : v;
             var op = recv && room > 0.02 ? aOp : 0;
@@ -793,7 +876,7 @@
             setAttr(b.arr, 'd', d); setOp(b.arr, op);
           });
         });
-        badge('iota', i >= 5 ? 'L = ' + f2(lossNow) : '', 'grad', i >= 5 ? seg(P[5], 0.2, 0.4) : 0);
+
         /* tuning table + loss curve */
         tuneRows.forEach(function (r, k) {
           var vals = [vM[k], vB[k], vA[k], vO[k]];
@@ -801,18 +884,18 @@
             setStyle(c.firstChild, 'width', (100 * vals[j]).toFixed(1) + '%');
             setText(c.lastChild, f2(vals[j]));
           });
-          setCls(r.row, 'nd-win', P[4] > 0.9 && k === sel);
+          setCls(r.row, 'nd-win', selOp >= 1 && k === sel);
         });
         var d2 = '';
         for (var qn = 0; qn <= Math.floor(sIdx); qn++) d2 += (qn ? 'L' : 'M') + (200 * qn / K).toFixed(1) + ',' + (36 - 34 * L0[qn] / lmax).toFixed(1);
         if (sIdx % 1 > 0) d2 += 'L' + (200 * sIdx / K).toFixed(1) + ',' + (36 - 34 * lossNow / lmax).toFixed(1);
-        setAttr(spark, 'd', d2);
+        setAttr(spark, 'd', lossShown ? d2 : '');
         setAttr(sparkDot, 'cx', (200 * sIdx / K).toFixed(1)); setAttr(sparkDot, 'cy', (36 - 34 * lossNow / lmax).toFixed(1));
-        setOp(sparkDot, P[5] > 0.3 ? 1 : 0);
-        setText(lossTxt, P[5] > 0.3 ? 'loss ' + f2(lossNow) + ' · step ' + Math.round(sIdx) : 'loss');
+        setOp(sparkDot, lossShown ? 1 : 0);
+        setText(lossTxt, lossShown ? 'loss ' + f2(lossNow) + ' · step ' + Math.round(sIdx) : 'loss');
         boxEls.forEach(function (b, k) { setCls(b.r, 'nd-red', k === red); setCls(b.tb, 'nd-red', k === red); });
         setText(imgCap, cap);
-        if (i === 8) { hot = ['iota']; }
+        if (i === 7) { hot = ['iota']; }
         lineHot(lines); nodeHot(hot);
         dotsDone();
       };
@@ -820,6 +903,13 @@
 
     var HOLD = 900;
     steps.forEach(function (st) { st.e = Math.max(0.5, 1 - HOLD / st.dur); });
+    var TOT = 0, CUM = [];
+    steps.forEach(function (st) { CUM.push(TOT); TOT += st.dur; });
+    function globalPos(i, pr) { return (CUM[i] + clamp01(pr) * steps[i].dur) / TOT; }
+    steps.forEach(function (st, k) {     // step boundaries as ticks on the single progress bar
+      if (!k) return;
+      var tk = h('b', 'nd-tick'); tk.style.left = (100 * CUM[k] / TOT).toFixed(3) + '%'; progEl.appendChild(tk);
+    });
     var pillEls = steps.map(function (st, i) {
       var b = h('button', 'nd-pill', '<span>' + (i + 1) + '</span><em>' + st.t + '</em>');
       b.type = 'button'; b.setAttribute('aria-label', 'Step ' + (i + 1) + ': ' + st.t);
@@ -831,7 +921,7 @@
       applyMode(i, p);
       pillEls.forEach(function (b, k) { setCls(b, 'nd-on', k === i); setCls(b, 'nd-done', k < i); });
       if (capEl.dataset.step !== String(i)) { capEl.innerHTML = steps[i].cap; capEl.dataset.step = String(i); }
-      setStyle(progBar, 'width', (100 * p).toFixed(2) + '%');
+      setStyle(progBar, 'width', (100 * globalPos(i, p)).toFixed(3) + '%');
     }
 
     /* ================================================================ layout */
@@ -845,6 +935,7 @@
     new ResizeObserver(function () { pickLayout(); dirty = true; kick(); }).observe(treeP);
 
     /* ================================================================ player */
+    /* one clock: (step, p) advances at a constant rate; the progress bar shows the global position */
     var step = 0, p = 0, playing = false, last = 0, visible = false, started = false, raf = 0, dirty = true, holdT = 0;
     function setPlayBtn() {
       bPlay.innerHTML = playing ? '<span aria-hidden="true">&#10074;&#10074;</span>' : '<span aria-hidden="true">&#9654;</span>';
@@ -869,15 +960,15 @@
       raf = 0;
       if (playing) {
         var dt = Math.min(100, now - last); last = now;
-        if (reduce) { p = 1; holdT += dt; if (holdT >= steps[step].dur) { holdT = 0; advance(); } }
-        else { p += dt / steps[step].dur; if (p >= 1) advance(); }
+        if (reduce) { p = 1; holdT += dt; if (holdT >= steps[step].dur) { holdT = 0; advance(0); } }
+        else { p += dt / steps[step].dur; if (p >= 1) advance((p - 1) * steps[step].dur); }
         dirty = true;
       }
       if (dirty) { applyState(step, Math.min(1, p)); dirty = playing; }
       if (visible && (playing || dirty)) raf = requestAnimationFrame(frame);
     }
-    function advance() {
-      if (step < steps.length - 1) { step += 1; p = reduce ? 1 : 0; }
+    function advance(overMs) {   // carry the time past the step end into the next step, so the clock never stalls
+      if (step < steps.length - 1) { step += 1; p = reduce ? 1 : Math.min(0.99, overMs / steps[step].dur); }
       else { p = 1; playing = false; setPlayBtn(); }
     }
     function kick() { if (!raf && visible) raf = requestAnimationFrame(frame); }
@@ -893,9 +984,10 @@
     setPlayBtn();
     applyState(step, p);
 
-    /* hook for automated checks */
+    /* hooks for automated checks */
     root.__nd = { go: function (i, pr) { playing = false; setPlayBtn(); go(i, pr); applyState(step, p); }, steps: steps.length,
-                  ends: steps.map(function (st) { return st.e; }), durs: steps.map(function (st) { return st.dur; }) };
+                  ends: steps.map(function (st) { return st.e; }), durs: steps.map(function (st) { return st.dur; }),
+                  state: function () { return { step: step, p: p, g: globalPos(step, Math.min(1, p)), playing: playing }; } };
   }
 
   /* ================================================================== boot */

@@ -62,6 +62,9 @@
 .npt pre.npt-bib { font-size: 0.75em; background: var(--np-soft); border: 1px solid var(--np-line); border-radius: 6px; padding: 1em; overflow-x: auto; white-space: pre; }
 
 /* ---------------------------------------------------------------- animated walkthroughs */
+/* the theme gives b, i, span, p, a, img ... a 0.2s transition; everything inside a walkthrough is driven
+   frame by frame by one clock, so CSS transitions there would lag behind it */
+.npt-demo *, .npt-demo *::before, .npt-demo *::after { transition: none; }
 .npt-demo {
   position: relative;
   border: 1px solid var(--np-line);
@@ -89,18 +92,18 @@
 .nd-panel-h span { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--np-muted); }
 
 /* code */
-.nd-pre { margin: 0; padding: 8px 8px 8px 6px; background: #f8f9fa; border-radius: 6px; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+.nd-pre { margin: 0; padding: 8px 8px 8px 6px; background: transparent; border-radius: 6px; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   white-space: pre-wrap; word-break: break-word; overflow: hidden; color: #343a40; }
-.nd-ln { position: relative; padding: 0 4px 0 calc(1.7em + var(--ind, 0) * 1ch); text-indent: -1.7em; border-left: 3px solid transparent;
-  border-radius: 3px; transition: background-color 0.25s, opacity 0.25s, border-color 0.25s; min-height: 1.55em; }
-.nd-ln-con { border-left-color: rgba(47, 158, 68, 0.55); }
-.nd-ln-sl { border-left-color: rgba(28, 126, 214, 0.6); }
-.nd-ln-imp { border-left-color: rgba(112, 72, 232, 0.5); }
-.nd-ln-con.nd-tint { background: rgba(47, 158, 68, 0.09); }
-.nd-ln-sl.nd-tint { background: rgba(28, 126, 214, 0.1); }
-.nd-ln-imp.nd-tint { background: rgba(112, 72, 232, 0.08); }
-.nd-ln.nd-on { background: #fff3bf !important; }
-.nd-ln.nd-gone { opacity: 0.32; }
+/* a line shows its role colour (stripe + tint) only once it has been typed: --a goes 0 -> 1 */
+.nd-ln { position: relative; padding: 0 4px 0 calc(1.7em + 3px + var(--ind, 0) * 1ch); text-indent: -1.7em; border-radius: 3px; min-height: 1.55em; }
+.nd-ln::before { content: ''; position: absolute; inset: 0; border-left: 3px solid var(--rc, transparent); background: var(--rb, transparent);
+  border-radius: 3px; opacity: var(--a, 0); pointer-events: none; }
+.nd-lt { position: relative; }
+.nd-ln-con { --rc: rgba(47, 158, 68, 0.55); --rb: rgba(47, 158, 68, 0.09); }
+.nd-ln-sl { --rc: rgba(28, 126, 214, 0.6); --rb: rgba(28, 126, 214, 0.1); }
+.nd-ln-imp { --rc: rgba(112, 72, 232, 0.5); --rb: rgba(112, 72, 232, 0.08); }
+.nd-ln.nd-on { background: #fff3bf; }
+.nd-ln.nd-on::before { background: transparent; }
 .nd-ln.nd-hov { outline: 1px solid rgba(52, 152, 219, 0.6); }
 .nd-ghost { color: transparent; }
 .nd-s { color: #2b8a3e; }
@@ -255,7 +258,8 @@
 .nd-b-main:hover { color: #fff; background: #2b7bb9; }
 .npt-tune .nd-b-main { background: var(--np-grad); border-color: var(--np-grad); }
 .npt-tune .nd-b-main:hover { background: #c64a0a; }
-.nd-prog { height: 3px; background: #e9ecef; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+.nd-prog { position: relative; height: 5px; background: #e9ecef; border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.nd-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #fff; }
 .nd-prog i { display: block; height: 100%; width: 0; background: var(--np-accent); }
 .npt-tune .nd-prog i { background: var(--np-grad); }
 .nd-c-con { color: var(--np-con); font-weight: 600; }
@@ -292,5 +296,4 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .nd-caret { animation: none; }
-  .nd-ln { transition: none; }
 }
