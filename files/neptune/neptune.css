@@ -220,8 +220,11 @@
 .nd-cell.c-con i { background: #8ce99a; }
 .nd-cell.c-sl i { background: #74c0fc; }
 .nd-cell span { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); font-weight: 700; font-size: 10px; color: #212529; }
-.nd-loss-row { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); align-items: center; gap: 10px; margin-top: 8px; font-size: 11.5px; color: var(--np-muted); }
-.nd-loss-row svg { display: block; width: 100%; max-width: 220px; height: 38px; overflow: visible; }
+.nd-tunep { margin-top: 12px; }
+.nd-tune-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, 260px); gap: 18px; align-items: center; }
+.nd-loss-row { display: flex; flex-direction: column; gap: 4px; padding-left: 16px; border-left: 1px solid var(--np-line); font-size: 11.5px; color: var(--np-muted); }
+.nd-loss-txt { font-weight: 600; color: var(--np-grad); }
+.nd-loss-row svg { display: block; width: 100%; height: 44px; overflow: visible; }
 .nd-spark { fill: none; stroke: var(--np-grad); stroke-width: 2; }
 .nd-spark-dot { fill: var(--np-grad); }
 .nd-tfoot { font-size: 10.5px; color: var(--np-muted); margin-top: 6px; line-height: 1.4; }
@@ -292,6 +295,8 @@
   .nd-pre { font-size: 10.5px; }
   .nd-chipfly { font-size: 10.5px; }
   .nd-tr { grid-template-columns: minmax(0, 1.25fr) repeat(4, minmax(0, 1fr)); gap: 3px; }
+  .nd-tune-body { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .nd-loss-row { padding-left: 0; padding-top: 8px; border-left: 0; border-top: 1px solid var(--np-line); }
   .npt table.npt-t { font-size: 0.78em; }
 }
 @media (prefers-reduced-motion: reduce) {

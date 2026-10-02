@@ -247,15 +247,17 @@
         tuneRows.push({ row: row, c: [cells[0], cells[1], cells[2], cells[3]] });
         grid.appendChild(row);
       }
-      tuneP.appendChild(grid);
+      var body = h('div', 'nd-tune-body');            // the table on the left, the loss on the right
+      body.appendChild(grid);
       var lr = h('div', 'nd-loss-row');
-      lossTxt = h('span', '', 'loss');
+      lossTxt = h('span', 'nd-loss-txt', 'loss');
       var sv = s('svg', { viewBox: '0 0 200 38' });
       spark = s('path', { 'class': 'nd-spark', d: '' }, sv);
       sparkDot = s('circle', { r: 3, 'class': 'nd-spark-dot', cx: -10, cy: -10 }, sv);
       lr.appendChild(lossTxt); lr.appendChild(sv);
-      tuneP.appendChild(lr);
-      left.appendChild(tuneP);
+      body.appendChild(lr);
+      tuneP.appendChild(body);
+      root.appendChild(tuneP);                          // a full row under the image, program and tree
     }
 
     /* ---------------- tree panel */
